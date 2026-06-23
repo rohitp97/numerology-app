@@ -73,6 +73,7 @@
       border: 1px solid rgba(245,166,35,0.2);
       margin-bottom: 2rem;
     }
+    @media (max-width: 560px) { .form-card { padding: 1.5rem 1rem; } }
     .form-card h2 {
       font-size: 1.3rem;
       color: var(--brown);
@@ -176,8 +177,7 @@
       gap: 0.75rem;
       margin-bottom: 2rem;
     }
-    @media (max-width: 600px) { .numbers-summary { grid-template-columns: repeat(2, 1fr); } }
-    @media (max-width: 360px) { .numbers-summary { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 600px) { .numbers-summary { grid-template-columns: repeat(3, 1fr); } }
 
     .num-badge {
       background: var(--white);
@@ -188,15 +188,15 @@
       box-shadow: var(--shadow);
       transition: transform 0.2s;
     }
-    .num-badge:hover { transform: translateY(-3px); }
+    @media (hover: hover) { .num-badge:hover { transform: translateY(-3px); } }
     .num-badge .num-value {
-      font-size: 2rem;
+      font-size: clamp(1.5rem, 5vw, 2rem);
       font-weight: 800;
       color: var(--gold-dark);
       line-height: 1;
     }
     .num-badge .num-label {
-      font-size: 0.7rem;
+      font-size: clamp(0.6rem, 2vw, 0.7rem);
       font-weight: 600;
       color: var(--text-light);
       text-transform: uppercase;
@@ -239,7 +239,7 @@
       margin-bottom: 1.5rem;
       box-shadow: var(--shadow);
     }
-    .report-header h2 { font-size: 1.6rem; }
+    .report-header h2 { font-size: clamp(1.2rem, 5vw, 1.6rem); word-break: break-word; }
     .report-header .report-dob { color: var(--gold-light); margin-top: 0.3rem; font-size: 0.95rem; }
 
     /* Section Cards */
@@ -252,7 +252,8 @@
       box-shadow: var(--shadow);
       transition: transform 0.2s;
     }
-    .section-card:hover { transform: translateX(3px); }
+    @media (max-width: 560px) { .section-card { padding: 1.2rem 1rem; } }
+    @media (hover: hover) { .section-card:hover { transform: translateX(3px); } }
 
     .section-card h3 {
       font-size: 1.1rem;
@@ -641,6 +642,7 @@ function renderReport(d) {
   const nums = [
     { label: 'Mulank', value: d.mulank },
     { label: 'Bhagyank', value: d.bhagyank },
+    { label: 'Name Number', value: d.name_number },
     { label: 'Connection', value: d.connection },
     { label: 'Personality', value: d.personality },
     { label: 'Soul Urge', value: d.soul_urge },
