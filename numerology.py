@@ -70,8 +70,8 @@ def get_success_number(day: int, month: int) -> int:
 
 
 def get_connection_number(mulank: int, bhagyank: int) -> int:
-    """Connection Number = |Bhagyank - Mulank|."""
-    return abs(bhagyank - mulank)
+    """Connection Number = Mulank + Bhagyank, reduced."""
+    return reduce_number(mulank + bhagyank)
 
 
 def get_name_number(name: str) -> int:
@@ -92,10 +92,11 @@ def get_loshu_grid(day: int, month: int, year: int) -> dict:
         d = int(ch)
         if 1 <= d <= 9:
             counts[d] += 1
-    # Also include Bhagyank in the grid
+    # Include Bhagyank in the grid — always reduce to single digit (master numbers like 33 → 6)
     bhagyank = get_bhagyank(day, month, year)
-    if 1 <= bhagyank <= 9:
-        counts[bhagyank] += 1
+    bhagyank_digit = reduce_number(bhagyank, keep_master=False)
+    if 1 <= bhagyank_digit <= 9:
+        counts[bhagyank_digit] += 1
     return counts
 
 

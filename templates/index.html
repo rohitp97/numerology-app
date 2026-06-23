@@ -623,6 +623,14 @@ async function downloadPDF() {
   }
 }
 
+// ── Helpers ───────────────────────────────────────────────────────────────────
+const MASTER_REDUCED = { 11: 2, 22: 4, 33: 6 };
+
+// Always show the reduced single digit — master numbers are internal only
+function fmtNum(n) {
+  return String(MASTER_REDUCED[n] || n);
+}
+
 // ── Render ────────────────────────────────────────────────────────────────────
 function renderReport(d) {
   // Header
@@ -642,7 +650,7 @@ function renderReport(d) {
   ];
   document.getElementById('numbers-summary').innerHTML = nums.map(n =>
     `<div class="num-badge">
-      <div class="num-value">${esc(String(n.value))}</div>
+      <div class="num-value">${esc(fmtNum(n.value))}</div>
       <div class="num-label">${esc(n.label)}</div>
     </div>`
   ).join('');
@@ -668,7 +676,7 @@ function renderReport(d) {
   // ── 2. Bhagyank ──
   sections.push(`
     <div class="section-card">
-      <h3><span class="section-number">2</span> Bhagyank ${esc(String(d.bhagyank))} — Destiny Number</h3>
+      <h3><span class="section-number">2</span> Bhagyank ${esc(fmtNum(d.bhagyank))} — Destiny Number</h3>
       <div class="section-body"><p>${esc(d.bhagyank_text)}</p></div>
     </div>
   `);
@@ -684,7 +692,7 @@ function renderReport(d) {
   // ── 4. Connection ──
   sections.push(`
     <div class="section-card">
-      <h3><span class="section-number">4</span> Connection Number: ${esc(String(d.connection))}</h3>
+      <h3><span class="section-number">4</span> Connection Number: ${esc(fmtNum(d.connection))}</h3>
       <div class="section-body"><p>${esc(d.connection_text)}</p></div>
     </div>
   `);
@@ -692,7 +700,7 @@ function renderReport(d) {
   // ── 5. Personality ──
   sections.push(`
     <div class="section-card">
-      <h3><span class="section-number">5</span> Personality Number: ${esc(String(d.personality))}</h3>
+      <h3><span class="section-number">5</span> Personality Number: ${esc(fmtNum(d.personality))}</h3>
       <div class="section-body"><p>${esc(d.personality_text)}</p></div>
     </div>
   `);
@@ -700,7 +708,7 @@ function renderReport(d) {
   // ── 6. Soul Urge ──
   sections.push(`
     <div class="section-card">
-      <h3><span class="section-number">6</span> Soul Urge Number: ${esc(String(d.soul_urge))}</h3>
+      <h3><span class="section-number">6</span> Soul Urge Number: ${esc(fmtNum(d.soul_urge))}</h3>
       <div class="section-body"><p>${esc(d.soul_urge_text)}</p></div>
     </div>
   `);
@@ -717,7 +725,7 @@ function renderReport(d) {
   const sd = d.success_data;
   sections.push(`
     <div class="section-card">
-      <h3><span class="section-number">8</span> Success Number: ${esc(String(d.success))}</h3>
+      <h3><span class="section-number">8</span> Success Number: ${esc(fmtNum(d.success))}</h3>
       <div class="section-body">
         <div class="kv-row"><span class="kv-label">Qualities:</span><span class="kv-value">${esc(sd.qualities)}</span></div>
         <div class="kv-row"><span class="kv-label">Challenges:</span><span class="kv-value">${esc(sd.challenges)}</span></div>
@@ -728,7 +736,7 @@ function renderReport(d) {
   // ── 9. Maturity ──
   sections.push(`
     <div class="section-card">
-      <h3><span class="section-number">9</span> Maturity Number: ${esc(String(d.maturity))}</h3>
+      <h3><span class="section-number">9</span> Maturity Number: ${esc(fmtNum(d.maturity))}</h3>
       <div class="section-body"><p>${esc(d.maturity_text)}</p></div>
     </div>
   `);
@@ -738,7 +746,7 @@ function renderReport(d) {
   const luckPct = d.personal_year_luck;
   sections.push(`
     <div class="section-card">
-      <h3><span class="section-number">10</span> Personal Year ${esc(String(d.personal_year))} (${esc(String(d.current_year))})</h3>
+      <h3><span class="section-number">10</span> Personal Year ${esc(fmtNum(d.personal_year))} (${esc(String(d.current_year))})</h3>
       <div class="section-body">
         <p><strong>${esc(pyd.title)}</strong></p>
         <div class="pos-neg-grid">
@@ -746,7 +754,7 @@ function renderReport(d) {
           <div class="neg-block"><strong>Watch Out For</strong>${esc(pyd.negative)}</div>
         </div>
         <div class="luck-bar-wrap" style="margin-top:1rem;">
-          <div class="luck-bar-label">Your Luck This Year (Mulank ${esc(String(d.mulank))} in Year ${esc(String(d.personal_year))})</div>
+          <div class="luck-bar-label">Your Luck This Year (Mulank ${esc(fmtNum(d.mulank))} in Year ${esc(fmtNum(d.personal_year))})</div>
           <div class="luck-bar-bg"><div class="luck-bar-fill" style="width:${luckPct}%"></div></div>
           <div class="luck-bar-pct">${luckPct}%</div>
         </div>
@@ -759,7 +767,7 @@ function renderReport(d) {
   const fields = car.fields.split(',').map(f => `<span class="tag">${esc(f.trim())}</span>`).join('');
   sections.push(`
     <div class="section-card">
-      <h3><span class="section-number">11</span> Career — Mulank ${esc(String(d.mulank))} + Bhagyank ${esc(String(d.bhagyank))}</h3>
+      <h3><span class="section-number">11</span> Career — Mulank ${esc(fmtNum(d.mulank))} + Bhagyank ${esc(fmtNum(d.bhagyank))}</h3>
       <div class="section-body">
         <p>${esc(car.general)}</p>
         <div class="kv-row" style="margin-top:0.6rem;"><span class="kv-label">Recommended Fields:</span></div>
