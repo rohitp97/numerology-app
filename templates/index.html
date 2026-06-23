@@ -688,7 +688,7 @@ async function downloadPDF() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `numerology_${currentName.replace(/\s+/g,'_')}.pdf`;
+    a.download = `${currentName} - Numerology Report.pdf`;
     a.click();
     URL.revokeObjectURL(url);
   } catch(e) {
