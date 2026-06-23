@@ -114,6 +114,17 @@
       border-color: var(--gold);
       box-shadow: 0 0 0 3px rgba(245,166,35,0.15);
     }
+    .field input.invalid {
+      border-color: #cc3333;
+      box-shadow: 0 0 0 3px rgba(204,51,51,0.12);
+    }
+    .field-error {
+      font-size: 0.8rem;
+      color: #cc3333;
+      margin-top: 0.3rem;
+      display: none;
+    }
+    .field-error.visible { display: block; }
 
     .btn-generate {
       width: 100%;
@@ -484,11 +495,13 @@
     <div class="form-grid">
       <div class="field">
         <label for="name">Full Name</label>
-        <input type="text" id="name" placeholder="e.g. Rohit Sharma" autocomplete="name" />
+        <input type="text" id="name" placeholder="e.g. Rohit Sharma" autocomplete="name" maxlength="100" />
+        <div class="field-error" id="name-error"></div>
       </div>
       <div class="field">
         <label for="dob">Date of Birth</label>
         <input type="date" id="dob" />
+        <div class="field-error" id="dob-error"></div>
       </div>
     </div>
     <button class="btn-generate" id="btn-generate" onclick="generateReport()">
@@ -555,14 +568,75 @@ function hideError() {
   document.getElementById('error-msg').style.display = 'none';
 }
 
+// ── Validation ────────────────────────────────────────────────────────────────
+function setFieldError(fieldId, errorId, msg) {
+  const input = document.getElementById(fieldId);
+  const err   = document.getElementById(errorId);
+  if (msg) {
+    input.classList.add('invalid');
+    err.textContent = msg;
+    err.classList.add('visible');
+  } else {
+    input.classList.remove('invalid');
+    err.textContent = '';
+    err.classList.remove('visible');
+  }
+}
+
+function validateName(name) {
+  if (!name) return 'Please enter your full name.';
+  if (name.length < 2) return 'Name must be at least 2 characters.';
+  if (!/^[A-Za-z][A-Za-z\s'\-.]*$/.test(name))
+    return 'Name can only contain letters, spaces, hyphens, and apostrophes.';
+  if ((name.match(/[A-Za-z]/g) || []).length < 2)
+    return 'Please enter a name with at least 2 letters.';
+  return '';
+}
+
+function validateDob(dob) {
+  if (!dob) return 'Please select your date of birth.';
+  const d = new Date(dob);
+  if (isNaN(d.getTime())) return 'Please enter a valid date.';
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  if (d >= today) return 'Date of birth cannot be today or in the future.';
+  const ageYears = (today - d) / (365.25 * 24 * 60 * 60 * 1000);
+  if (ageYears > 120) return 'Please enter a valid date of birth.';
+  return '';
+}
+
+// Set max date to today so the date picker blocks future dates natively
+document.addEventListener('DOMContentLoaded', () => {
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('dob').setAttribute('max', today);
+
+  // Real-time blur validation
+  document.getElementById('name').addEventListener('blur', () => {
+    const val = document.getElementById('name').value.trim();
+    setFieldError('name', 'name-error', validateName(val));
+  });
+  document.getElementById('name').addEventListener('input', () => {
+    if (document.getElementById('name').classList.contains('invalid')) {
+      const val = document.getElementById('name').value.trim();
+      setFieldError('name', 'name-error', validateName(val));
+    }
+  });
+  document.getElementById('dob').addEventListener('change', () => {
+    const val = document.getElementById('dob').value;
+    setFieldError('dob', 'dob-error', validateDob(val));
+  });
+});
+
 // ── Generate Report ───────────────────────────────────────────────────────────
 async function generateReport() {
   hideError();
   const name = document.getElementById('name').value.trim();
-  const dob = document.getElementById('dob').value.trim();
+  const dob  = document.getElementById('dob').value.trim();
 
-  if (!name) { showError('Please enter your full name.'); return; }
-  if (!dob) { showError('Please select your date of birth.'); return; }
+  const nameErr = validateName(name);
+  const dobErr  = validateDob(dob);
+  setFieldError('name', 'name-error', nameErr);
+  setFieldError('dob',  'dob-error',  dobErr);
+  if (nameErr || dobErr) return;
 
   currentName = name;
   currentDob = dob;
