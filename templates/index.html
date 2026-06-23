@@ -477,6 +477,74 @@
       background: linear-gradient(90deg, transparent, var(--gold), transparent);
       margin: 1.5rem 0;
     }
+
+    /* Consultation Card */
+    .consult-card {
+      background: linear-gradient(135deg, var(--brown) 0%, #6b3410 100%);
+      border-radius: var(--radius);
+      padding: 2rem 2rem 1.75rem;
+      margin-top: 2rem;
+      text-align: center;
+      color: var(--white);
+      box-shadow: 0 6px 24px rgba(139,69,19,0.3);
+    }
+    .consult-card .consult-heading {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gold-light);
+      margin-bottom: 0.6rem;
+    }
+    .consult-card h3 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    .consult-card .consult-title {
+      font-size: 0.9rem;
+      color: var(--gold-light);
+      margin-bottom: 1rem;
+    }
+    .consult-card .consult-msg {
+      font-size: 0.95rem;
+      color: rgba(255,255,255,0.85);
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+      max-width: 480px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .consult-actions {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .consult-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.65rem 1.4rem;
+      border-radius: 8px;
+      font-size: 0.92rem;
+      font-weight: 700;
+      text-decoration: none;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .consult-btn-wa {
+      background: #25D366;
+      color: #fff;
+      box-shadow: 0 3px 10px rgba(37,211,102,0.35);
+    }
+    .consult-btn-call {
+      background: rgba(255,255,255,0.12);
+      color: var(--white);
+      border: 1.5px solid rgba(255,255,255,0.35);
+    }
+    @media (hover: hover) {
+      .consult-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 16px rgba(0,0,0,0.2); }
+    }
   </style>
 </head>
 <body>
@@ -538,6 +606,29 @@
     <button class="btn-pdf" id="btn-pdf-bottom" onclick="downloadPDF()">
       &#8595; Download PDF Report
     </button>
+
+    <!-- Consultation Card -->
+    <div class="consult-card">
+      <div class="consult-heading">Name Correction &amp; Personal Consultation</div>
+      <h3>Madhu Prasad</h3>
+      <div class="consult-title">Certified Numerologist</div>
+      <p class="consult-msg">
+        Is your name aligned with your numbers? A personalised name correction
+        can bring harmony between your name's vibration and your birth numbers.
+        Reach out to book a consultation.
+      </p>
+      <div class="consult-actions">
+        <a class="consult-btn consult-btn-wa"
+           href="https://wa.me/919163362273"
+           target="_blank" rel="noopener">
+          &#128172; WhatsApp
+        </a>
+        <a class="consult-btn consult-btn-call"
+           href="tel:+919163362273">
+          &#128222; +91 91633 62273
+        </a>
+      </div>
+    </div>
 
   </div><!-- /#report -->
 

@@ -697,8 +697,35 @@ def generate_pdf():
                 "All numbers 1-9 are present in your date of birth. You are blessed with a complete Lo Shu Grid!",
                 body_style))
 
-        story.append(Spacer(1, 8 * mm))
+        # Consultation section
+        story.append(Spacer(1, 10 * mm))
         story.append(HRFlowable(width="100%", thickness=2, color=gold))
+        story.append(Spacer(1, 6 * mm))
+        consult_heading = ParagraphStyle('ConsultHeading', parent=styles['Normal'],
+                                         alignment=TA_CENTER, fontSize=9, textColor=gold,
+                                         spaceAfter=4, fontName='Helvetica-Bold',
+                                         letterSpacing=1)
+        consult_name = ParagraphStyle('ConsultName', parent=styles['Normal'],
+                                      alignment=TA_CENTER, fontSize=16, textColor=dark_brown,
+                                      spaceAfter=2, fontName='Helvetica-Bold')
+        consult_body = ParagraphStyle('ConsultBody', parent=styles['Normal'],
+                                      alignment=TA_CENTER, fontSize=10, textColor=colors.HexColor('#5a3a1a'),
+                                      spaceAfter=6, leading=15)
+        story.append(Paragraph("NAME CORRECTION &amp; PERSONAL CONSULTATION", consult_heading))
+        story.append(Paragraph("Madhu Prasad", consult_name))
+        story.append(Paragraph("Certified Numerologist", consult_body))
+        story.append(Paragraph(
+            "Is your name aligned with your numbers? A personalised name correction can bring "
+            "harmony between your name’s vibration and your birth numbers.",
+            consult_body))
+        story.append(Paragraph(
+            "<b>WhatsApp / Call:</b> +91 91633 62273",
+            ParagraphStyle('ConsultContact', parent=styles['Normal'],
+                           alignment=TA_CENTER, fontSize=11, textColor=dark_brown,
+                           fontName='Helvetica-Bold', spaceAfter=4)))
+        story.append(Spacer(1, 6 * mm))
+        story.append(HRFlowable(width="100%", thickness=1, color=colors.HexColor('#e0c080')))
+        story.append(Spacer(1, 4 * mm))
         story.append(Paragraph(
             "Report generated with Numerology Report App",
             ParagraphStyle('footer', parent=styles['Normal'],
@@ -710,8 +737,7 @@ def generate_pdf():
 
         response = make_response(buffer.read())
         response.headers['Content-Type'] = 'application/pdf'
-        safe_name = name.replace(' ', '_')
-        response.headers['Content-Disposition'] = f'attachment; filename=numerology_{safe_name}.pdf'
+        response.headers['Content-Disposition'] = f'attachment; filename="{name} - Numerology Report.pdf"'
         return response
 
     except Exception as e:
