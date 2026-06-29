@@ -1755,6 +1755,27 @@ def add_consultation(client_id):
     return redirect(f'/admin/client/{client_id}')
 
 
+@app.route('/admin/pdf/<report_id>')
+@admin_required
+def download_report_pdf(report_id):
+    if not db:
+        return 'Database not configured', 500
+    try:
+        row = db.table('reports').select('pdf_url, client_id').eq('id', report_id).single().execute().data
+        if not row or not row.get('pdf_url'):
+            return 'PDF not found', 404
+        client = db.table('clients').select('name').eq('id', row['client_id']).single().execute().data
+        filename = f"{client['name']} - Numerology Report.pdf"
+        import httpx as _httpx
+        pdf_bytes = _httpx.get(row['pdf_url']).content
+        response = make_response(pdf_bytes)
+        response.headers['Content-Type'] = 'application/pdf'
+        response.headers['Content-Disposition'] = f'attachment; filename="{filename}"'
+        return response
+    except Exception as e:
+        return str(e), 500
+
+
 @app.route('/admin/client/<client_id>/delete', methods=['POST'])
 @admin_required
 def delete_client(client_id):

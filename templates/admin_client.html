@@ -125,7 +125,7 @@
           <div style="font-size:0.9rem; color:rgba(255,255,255,0.8);">Numerology Report</div>
           <div style="display:flex; align-items:center; gap:12px;">
             {% if r.pdf_url %}
-            <a href="{{ r.pdf_url }}" target="_blank"
+            <a href="/admin/pdf/{{ r.id }}"
                style="font-size:0.8rem; color:#ffd700; text-decoration:none; border:1px solid rgba(255,215,0,0.4); padding:3px 10px; border-radius:5px;">
               &#8595; PDF
             </a>
