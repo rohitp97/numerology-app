@@ -545,6 +545,574 @@
     @media (hover: hover) {
       .consult-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 16px rgba(0,0,0,0.2); }
     }
+
+    /* ── Pinnacle & Challenge Cards ── */
+    .pin-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
+      margin-top: 0.6rem;
+    }
+    @media (max-width: 560px) { .pin-grid { grid-template-columns: 1fr; } }
+    .pin-card {
+      border-radius: 10px;
+      border: 1.5px solid var(--border);
+      padding: 0.85rem 1rem;
+      background: var(--surface);
+      position: relative;
+    }
+    .pin-card.active {
+      border-color: var(--gold);
+      background: linear-gradient(135deg, rgba(245,166,35,0.06) 0%, var(--surface) 100%);
+    }
+    .pin-card-badge {
+      display: inline-block;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      padding: 0.15rem 0.5rem;
+      border-radius: 10px;
+      margin-bottom: 0.4rem;
+      background: var(--brown);
+      color: #fff;
+    }
+    .pin-card.active .pin-card-badge { background: var(--gold); color: #333; }
+    .pin-card-num { font-size: 2rem; font-weight: 800; color: var(--brown); line-height: 1; margin-bottom: 0.2rem; }
+    .pin-card.active .pin-card-num { color: var(--gold); }
+    .pin-card-title { font-size: 0.82rem; font-weight: 600; margin-bottom: 0.3rem; }
+    .pin-card-age { font-size: 0.72rem; color: var(--text-muted); margin-bottom: 0.5rem; }
+    .pin-card-text { font-size: 0.83rem; line-height: 1.5; }
+    .pin-card-themes { font-size: 0.72rem; color: var(--text-muted); margin-top: 0.4rem; }
+    .pin-card-advice { font-size: 0.8rem; font-style: italic; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid var(--border); }
+    .active-label {
+      position: absolute;
+      top: 0.6rem;
+      right: 0.75rem;
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: var(--gold);
+      letter-spacing: 0.04em;
+    }
+    .challenge-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
+      margin-top: 0.6rem;
+    }
+    @media (max-width: 560px) { .challenge-grid { grid-template-columns: 1fr; } }
+    .chal-card {
+      border-radius: 10px;
+      border: 1.5px solid var(--border);
+      padding: 0.85rem 1rem;
+      background: var(--surface);
+      position: relative;
+    }
+    .chal-card.main-challenge {
+      border-color: var(--brown);
+      background: linear-gradient(135deg, rgba(139,69,19,0.05) 0%, var(--surface) 100%);
+    }
+    .chal-card-badge {
+      display: inline-block;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      padding: 0.15rem 0.5rem;
+      border-radius: 10px;
+      margin-bottom: 0.4rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+    }
+    .chal-card.main-challenge .chal-card-badge { background: var(--brown); border-color: var(--brown); color: #fff; }
+    .chal-card-num { font-size: 2rem; font-weight: 800; color: var(--brown); line-height: 1; margin-bottom: 0.2rem; }
+    .chal-card-title { font-size: 0.82rem; font-weight: 600; margin-bottom: 0.3rem; }
+    .chal-card-text { font-size: 0.83rem; line-height: 1.5; }
+    .chal-card-lesson { font-size: 0.8rem; font-style: italic; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid var(--border); }
+
+    /* ── Monthly Forecast ── */
+    .forecast-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.45rem;
+      margin-top: 1rem;
+    }
+    @media (max-width: 560px) { .forecast-grid { grid-template-columns: repeat(3, 1fr); } }
+    .forecast-cell {
+      text-align: center;
+      padding: 0.5rem 0.3rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .forecast-cell.current-month {
+      background: var(--brown);
+      border-color: var(--brown);
+      color: var(--white);
+    }
+    .forecast-cell.current-month .forecast-month-name { opacity: 0.8; }
+    .forecast-month-name { font-size: 0.68rem; opacity: 0.6; margin-bottom: 0.1rem; }
+    .forecast-pm-num { font-size: 1.35rem; font-weight: 700; }
+    .forecast-cell { cursor: pointer; transition: transform 0.12s, box-shadow 0.12s; }
+    @media (hover: hover) { .forecast-cell:hover { transform: translateY(-2px); box-shadow: 0 3px 10px rgba(0,0,0,0.1); } }
+    .forecast-cell.fc-active { outline: 2px solid var(--gold); outline-offset: 1px; }
+    .fc-detail-panel {
+      margin-top: 0.75rem;
+      padding: 0.9rem 1rem;
+      border-radius: 10px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      animation: fc-slide-in 0.18s ease;
+    }
+    @keyframes fc-slide-in { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+    .fc-detail-heading { font-weight: 700; font-size: 0.95rem; color: var(--brown); margin-bottom: 0.6rem; }
+
+    /* ── Daily Forecast ── */
+    .days-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 0.3rem;
+      margin-top: 0.5rem;
+    }
+    .day-cell {
+      text-align: center;
+      padding: 0.35rem 0.1rem;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+    @media (hover: hover) { .day-cell:hover { transform: translateY(-1px); box-shadow: 0 2px 6px rgba(0,0,0,0.1); } }
+    .day-cell.today-day { background: var(--brown); border-color: var(--brown); color: var(--white); }
+    .day-cell.today-day .day-pd-num { opacity: 0.8; }
+    .day-cell.day-active { outline: 2px solid var(--gold); outline-offset: 1px; }
+    .day-num { font-size: 0.78rem; font-weight: 600; }
+    .day-pd-num { font-size: 0.65rem; opacity: 0.6; }
+    .pd-detail-panel {
+      margin-top: 0.75rem;
+      padding: 0.9rem 1rem;
+      border-radius: 10px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      animation: fc-slide-in 0.18s ease;
+    }
+    .pd-detail-heading { font-weight: 700; font-size: 0.95rem; color: var(--brown); margin-bottom: 0.6rem; }
+
+    /* ── Personal Day Lucky Colors ── */
+    .color-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.4rem; }
+    .color-chip {
+      padding: 0.2rem 0.7rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+    }
+
+    /* ── Lo Shu Planes ── */
+    .planes-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.5rem;
+      margin-top: 0.8rem;
+    }
+    @media (max-width: 560px) { .planes-grid { grid-template-columns: repeat(2, 1fr); } }
+    .plane-cell {
+      text-align: center;
+      padding: 0.6rem 0.4rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    .plane-cell.strong  { background: rgba(76,175,80,0.1);  border-color: #4caf50; }
+    .plane-cell.partial { background: rgba(255,167,38,0.1); border-color: #ffa726; }
+    .plane-cell.absent  { background: rgba(255,112,67,0.08); border-color: #ff7043; }
+    .plane-name { font-size: 0.78rem; font-weight: 600; margin-bottom: 0.15rem; }
+    .plane-nums { font-size: 0.7rem; opacity: 0.55; }
+    .plane-badge {
+      display: inline-block;
+      font-size: 0.65rem;
+      padding: 0.05rem 0.4rem;
+      border-radius: 10px;
+      margin-top: 0.2rem;
+      font-weight: 600;
+    }
+    .plane-badge.strong  { background: #4caf50; color: #fff; }
+    .plane-badge.partial { background: #ffa726; color: #fff; }
+    .plane-badge.absent  { background: #ff7043; color: #fff; }
+
+    /* ── Arrows ── */
+    .arrows-wrap { margin-top: 0.8rem; }
+    .arrows-heading {
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+      color: var(--brown);
+    }
+    .arrow-card {
+      padding: 0.55rem 0.75rem;
+      border-radius: 6px;
+      margin-bottom: 0.4rem;
+      border-left: 3px solid;
+    }
+    .arrow-card.strength { border-color: #4caf50; background: rgba(76,175,80,0.07); }
+    .arrow-card.isolation { border-color: #ff7043; background: rgba(255,112,67,0.07); }
+    .arrow-name { font-weight: 600; font-size: 0.85rem; }
+    .arrow-nums { font-size: 0.72rem; opacity: 0.55; margin-bottom: 0.15rem; }
+    .arrow-text { font-size: 0.84rem; }
+
+    /* ── Special Combos ── */
+    .combo-card {
+      padding: 0.55rem 0.75rem;
+      border-radius: 6px;
+      margin-bottom: 0.4rem;
+      border-left: 3px solid var(--gold);
+      background: var(--surface);
+    }
+    .combo-label { font-weight: 600; font-size: 0.85rem; color: var(--brown); }
+    .combo-text { font-size: 0.84rem; margin-top: 0.15rem; }
+
+    /* ── Mode Tabs ── */
+    .mode-tabs {
+      display: flex;
+      border-bottom: 2px solid rgba(245,166,35,0.25);
+      margin-bottom: 1.5rem;
+      gap: 0;
+    }
+    .mode-tab {
+      flex: 1;
+      padding: 0.65rem 0.5rem;
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-light);
+      cursor: pointer;
+      letter-spacing: 0.02em;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .mode-tab.active {
+      color: var(--brown);
+      border-bottom-color: var(--gold);
+    }
+    .mode-tab:hover:not(.active) { color: var(--brown); }
+
+    /* ── Compatibility Form ── */
+    .compat-two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.2rem;
+      margin-bottom: 1.5rem;
+    }
+    @media (max-width: 560px) { .compat-two-col { grid-template-columns: 1fr; } }
+    .compat-person-label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--gold-dark);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 0.75rem;
+    }
+
+    /* ── Compatibility Result ── */
+    #compat-result { display: none; }
+    .compat-banner {
+      text-align: center;
+      padding: 1.75rem 1rem 1.5rem;
+      background: linear-gradient(135deg, var(--brown) 0%, var(--brown-light) 100%);
+      border-radius: var(--radius);
+      color: var(--white);
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow);
+    }
+    .compat-banner .compat-names {
+      font-size: clamp(1.1rem, 4vw, 1.5rem);
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+    .compat-banner .compat-heart { color: var(--gold-light); margin: 0 0.4rem; }
+    .compat-banner .compat-subtitle {
+      font-size: 0.85rem;
+      color: var(--gold-light);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-top: 0.2rem;
+    }
+    .compat-score-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .compat-pct {
+      font-size: clamp(2rem, 6vw, 2.8rem);
+      font-weight: 800;
+      color: var(--gold-light);
+      line-height: 1;
+    }
+    .compat-label-box { text-align: left; }
+    .compat-score-label {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--white);
+    }
+    .compat-bar-track {
+      height: 8px;
+      background: rgba(255,255,255,0.25);
+      border-radius: 4px;
+      margin-top: 0.5rem;
+      overflow: hidden;
+      width: 160px;
+    }
+    .compat-bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      background: var(--gold-light);
+      transition: width 0.8s ease;
+    }
+
+    .compat-persons-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.2rem;
+    }
+    @media (max-width: 560px) { .compat-persons-grid { grid-template-columns: 1fr; } }
+    .compat-person-card {
+      background: var(--white);
+      border: 2px solid rgba(245,166,35,0.3);
+      border-radius: var(--radius);
+      padding: 1.1rem 1.25rem;
+      box-shadow: var(--shadow);
+    }
+    .compat-person-card h4 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--brown);
+      margin-bottom: 0.1rem;
+    }
+    .compat-person-card .cp-dob {
+      font-size: 0.78rem;
+      color: var(--text-light);
+      margin-bottom: 0.7rem;
+    }
+    .cp-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      padding: 0.22rem 0;
+      border-bottom: 1px solid rgba(245,166,35,0.15);
+    }
+    .cp-row:last-child { border-bottom: none; }
+    .cp-row .cp-key { color: var(--text-light); font-weight: 600; }
+    .cp-row .cp-val { font-weight: 700; color: var(--brown); }
+
+    .compat-breakdown-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      border-left: 4px solid var(--gold);
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.2rem;
+      box-shadow: var(--shadow);
+    }
+    .compat-breakdown-card h4 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--brown);
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      font-size: 0.85rem;
+    }
+    .score-bar-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+    .score-bar-row:last-child { margin-bottom: 0; }
+    .sbr-label { font-size: 0.82rem; font-weight: 600; color: var(--text-light); min-width: 120px; }
+    .sbr-track {
+      flex: 1;
+      height: 7px;
+      background: rgba(139,69,19,0.1);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .sbr-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.7s ease;
+    }
+    .sbr-score { font-size: 0.8rem; font-weight: 700; color: var(--brown); min-width: 50px; text-align: right; }
+
+    .compat-rel-card {
+      background: var(--cream-dark);
+      border: 1px solid rgba(245,166,35,0.4);
+      border-radius: var(--radius);
+      padding: 1.1rem 1.4rem;
+      margin-bottom: 1.2rem;
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+    .rel-num-circle {
+      width: 52px; height: 52px;
+      flex-shrink: 0;
+      border-radius: 50%;
+      background: var(--gold);
+      color: var(--white);
+      font-size: 1.5rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 3px 10px rgba(245,166,35,0.4);
+    }
+    .rel-content-title { font-size: 0.78rem; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.05em; }
+    .rel-content-text { font-size: 0.9rem; color: var(--text); margin-top: 0.3rem; }
+
+    .compat-analysis-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      border-left: 4px solid var(--brown);
+      padding: 1.25rem 1.5rem;
+      box-shadow: var(--shadow);
+    }
+    .compat-analysis-card h4 {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-light);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.6rem;
+    }
+    .compat-analysis-card p { font-size: 0.93rem; line-height: 1.65; }
+    .compat-error {
+      background: #fff0f0; border: 1px solid #ffcccc; border-radius: 8px;
+      padding: 0.8rem 1.2rem; color: #cc3333; font-size: 0.95rem;
+      margin-top: 1rem; display: none;
+    }
+
+    /* ── Lo Shu Compat Section ── */
+    .compat-loshu-section { margin-top: 1.5rem; }
+    .compat-loshu-section > h3 {
+      font-size: 0.82rem; font-weight: 700; color: var(--text-light);
+      text-transform: uppercase; letter-spacing: 0.06em;
+      margin-bottom: 1rem; padding-bottom: 0.5rem;
+      border-bottom: 2px solid rgba(245,166,35,0.3);
+    }
+    .compat-grid-trio {
+      display: grid; grid-template-columns: 1fr 1fr 1fr;
+      gap: 0.75rem; margin-bottom: 1.2rem;
+    }
+    @media (max-width: 560px) { .compat-grid-trio { grid-template-columns: 1fr; } }
+    .cgrid-item {
+      background: var(--white); border-radius: var(--radius);
+      border: 1px solid rgba(245,166,35,0.25);
+      padding: 0.9rem 0.75rem; box-shadow: var(--shadow); text-align: center;
+    }
+    .cgrid-item-title {
+      font-size: 0.68rem; font-weight: 700; color: var(--text-light);
+      text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.3rem;
+    }
+    .cgrid-item-name {
+      font-size: 0.82rem; font-weight: 700; color: var(--brown); margin-bottom: 0.5rem;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .lm-table { border-collapse: collapse; margin: 0 auto; }
+    .lm-table td {
+      width: 28px; height: 28px; text-align: center; vertical-align: middle;
+      font-size: 0.76rem; font-weight: 700; border-radius: 4px;
+      border: 1px solid rgba(139,69,19,0.12); padding: 0;
+    }
+    .lm-table td.lm-present  { background: rgba(245,166,35,0.22); color: var(--brown); }
+    .lm-table td.lm-absent   { background: rgba(139,69,19,0.04); color: rgba(139,69,19,0.22); }
+    .lm-table td.lm-overloaded { background: rgba(139,69,19,0.18); color: var(--brown); font-weight: 800; }
+    .lm-cnt { font-size: 0.52rem; display: block; line-height: 1; }
+
+    .compat-gifts-card, .compat-comp-card,
+    .compat-planes-compat-card, .compat-arrows-card,
+    .compat-plane-states-card, .compat-key-nums-card {
+      background: var(--white); border-radius: var(--radius);
+      border-left: 4px solid var(--gold);
+      padding: 1.1rem 1.4rem; margin-bottom: 1rem; box-shadow: var(--shadow);
+    }
+    .compat-gifts-card h4, .compat-comp-card h4,
+    .compat-planes-compat-card h4, .compat-arrows-card h4,
+    .compat-plane-states-card h4, .compat-key-nums-card h4 {
+      font-size: 0.82rem; font-weight: 700; color: var(--text-light);
+      text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.8rem;
+    }
+    .gift-row { margin-bottom: 0.6rem; }
+    .gift-row-label {
+      font-size: 0.75rem; font-weight: 700; color: var(--text-light); margin-bottom: 0.3rem;
+    }
+    .gift-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+    .gift-chip {
+      display: inline-flex; align-items: center; gap: 0.3rem;
+      background: rgba(245,166,35,0.14); border: 1px solid rgba(245,166,35,0.4);
+      border-radius: 20px; padding: 0.22rem 0.65rem;
+      font-size: 0.75rem; color: var(--brown); font-weight: 600;
+    }
+    .gift-chip .gnum { font-weight: 800; font-size: 0.85rem; }
+    .gift-chip.shared-present { background: rgba(139,69,19,0.07); border-color: rgba(139,69,19,0.22); }
+    .gift-chip.missing { background: rgba(120,120,120,0.06); border-color: rgba(120,120,120,0.18); color: var(--text-light); }
+
+    .comp-bar-wrap { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem; }
+    .comp-bar-label { font-size: 0.78rem; color: var(--text-light); font-weight: 600; min-width: 160px; }
+    .comp-bar-track { flex: 1; height: 7px; background: rgba(139,69,19,0.1); border-radius: 4px; overflow: hidden; }
+    .comp-bar-fill { height: 100%; border-radius: 4px; background: var(--gold); transition: width 0.7s ease; }
+    .comp-bar-pct { font-size: 0.78rem; font-weight: 700; color: var(--brown); min-width: 36px; text-align: right; }
+
+    .arrow-state-group { margin-bottom: 0.7rem; }
+    .arrow-state-group:last-child { margin-bottom: 0; }
+    .arrow-state-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.35rem; }
+    .arrow-state-label.new       { color: #27ae60; }
+    .arrow-state-label.sustained { color: var(--gold-dark); }
+    .arrow-state-label.absent    { color: var(--text-light); }
+    .arrow-badges { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+    .arrow-badge {
+      display: inline-block; border-radius: 20px;
+      padding: 0.2rem 0.6rem; font-size: 0.73rem; font-weight: 600; border: 1px solid;
+    }
+    .arrow-badge.new       { background: rgba(39,174,96,0.1);   border-color: rgba(39,174,96,0.4);   color: #27ae60; }
+    .arrow-badge.sustained { background: rgba(212,160,23,0.12); border-color: rgba(212,160,23,0.4);  color: var(--gold-dark); }
+    .arrow-badge.absent    { background: rgba(120,120,120,0.07);border-color: rgba(120,120,120,0.2); color: var(--text-light); }
+
+    .plane-state-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.4rem 0; border-bottom: 1px solid rgba(245,166,35,0.12);
+      font-size: 0.82rem; gap: 0.5rem; flex-wrap: wrap;
+    }
+    .plane-state-row:last-child { border-bottom: none; }
+    .plane-name { font-weight: 600; color: var(--text); min-width: 120px; }
+    .plane-states-row { display: flex; gap: 0.3rem; align-items: center; flex-wrap: wrap; }
+    .pstate-badge {
+      font-size: 0.65rem; font-weight: 700; padding: 0.12rem 0.45rem;
+      border-radius: 10px; text-transform: uppercase; letter-spacing: 0.03em;
+    }
+    .pstate-badge.absent   { background: rgba(120,120,120,0.1); color: var(--text-light); }
+    .pstate-badge.partial  { background: rgba(245,166,35,0.2);  color: var(--gold-dark); }
+    .pstate-badge.complete { background: rgba(39,174,96,0.15);  color: #27ae60; }
+    .upgrade-arrow { color: #27ae60; font-weight: 800; font-size: 0.85rem; margin-left: 0.15rem; }
+
+    .key-num-row {
+      display: flex; align-items: center; gap: 0.9rem;
+      padding: 0.55rem 0; border-bottom: 1px solid rgba(245,166,35,0.12);
+    }
+    .key-num-row:last-child { border-bottom: none; }
+    .key-num-circle {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--gold); color: var(--white);
+      font-size: 1rem; font-weight: 800;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .key-num-info { flex: 1; }
+    .key-num-title { font-size: 0.82rem; font-weight: 700; color: var(--brown); }
+    .key-num-theme { font-size: 0.73rem; color: var(--text-light); }
+    .key-num-counts { font-size: 0.75rem; color: var(--text-light); text-align: right; }
   </style>
 </head>
 <body>
@@ -559,23 +1127,66 @@
 
   <!-- Input Form -->
   <div class="form-card">
-    <h2>&#9733; Enter Your Details</h2>
-    <div class="form-grid">
-      <div class="field">
-        <label for="name">Full Name</label>
-        <input type="text" id="name" placeholder="e.g. Rohit Sharma" autocomplete="name" maxlength="100" />
-        <div class="field-error" id="name-error"></div>
-      </div>
-      <div class="field">
-        <label for="dob">Date of Birth</label>
-        <input type="date" id="dob" />
-        <div class="field-error" id="dob-error"></div>
-      </div>
+    <div class="mode-tabs">
+      <button class="mode-tab active" id="tab-individual" onclick="switchMode('individual')">&#9733; Personal Report</button>
+      <button class="mode-tab" id="tab-compat" onclick="switchMode('compat')">&#10084; Compatibility</button>
     </div>
-    <button class="btn-generate" id="btn-generate" onclick="generateReport()">
-      Generate My Report
-    </button>
-    <div class="error-msg" id="error-msg"></div>
+
+    <!-- Individual form -->
+    <div id="individual-form">
+      <div class="form-grid">
+        <div class="field">
+          <label for="name">Full Name</label>
+          <input type="text" id="name" placeholder="e.g. Rohit Sharma" autocomplete="name" maxlength="100" />
+          <div class="field-error" id="name-error"></div>
+        </div>
+        <div class="field">
+          <label for="dob">Date of Birth</label>
+          <input type="date" id="dob" />
+          <div class="field-error" id="dob-error"></div>
+        </div>
+      </div>
+      <button class="btn-generate" id="btn-generate" onclick="generateReport()">
+        Generate My Report
+      </button>
+      <div class="error-msg" id="error-msg"></div>
+    </div>
+
+    <!-- Compatibility form -->
+    <div id="compat-form" style="display:none;">
+      <div class="compat-two-col">
+        <div>
+          <div class="compat-person-label">Person 1</div>
+          <div class="field" style="margin-bottom:0.85rem;">
+            <label for="cname1">Full Name</label>
+            <input type="text" id="cname1" placeholder="e.g. Rohit Sharma" maxlength="100" />
+            <div class="field-error" id="cname1-error"></div>
+          </div>
+          <div class="field">
+            <label for="cdob1">Date of Birth</label>
+            <input type="date" id="cdob1" />
+            <div class="field-error" id="cdob1-error"></div>
+          </div>
+        </div>
+        <div>
+          <div class="compat-person-label">Person 2</div>
+          <div class="field" style="margin-bottom:0.85rem;">
+            <label for="cname2">Full Name</label>
+            <input type="text" id="cname2" placeholder="e.g. Priya Singh" maxlength="100" />
+            <div class="field-error" id="cname2-error"></div>
+          </div>
+          <div class="field">
+            <label for="cdob2">Date of Birth</label>
+            <input type="date" id="cdob2" />
+            <div class="field-error" id="cdob2-error"></div>
+          </div>
+        </div>
+      </div>
+      <button class="btn-generate" id="btn-compat" onclick="checkCompatibility()">
+        &#10084; Check Compatibility
+      </button>
+      <div class="compat-error" id="compat-error"></div>
+    </div>
   </div>
 
   <div class="spinner" id="spinner">Calculating your numbers</div>
@@ -632,6 +1243,96 @@
 
   </div><!-- /#report -->
 
+  <!-- Compatibility Result -->
+  <div id="compat-result">
+
+    <div class="compat-banner">
+      <div class="compat-names">
+        <span id="cr-name1"></span>
+        <span class="compat-heart">&#10084;</span>
+        <span id="cr-name2"></span>
+      </div>
+      <div class="compat-subtitle">Numerology Compatibility</div>
+      <div class="compat-score-row">
+        <div class="compat-pct" id="cr-pct"></div>
+        <div class="compat-label-box">
+          <div class="compat-score-label" id="cr-label"></div>
+          <div class="compat-bar-track">
+            <div class="compat-bar-fill" id="cr-bar" style="width:0%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="compat-persons-grid">
+      <div class="compat-person-card" id="cr-card1"></div>
+      <div class="compat-person-card" id="cr-card2"></div>
+    </div>
+
+    <div class="compat-breakdown-card">
+      <h4>Score Breakdown</h4>
+      <div id="cr-bars"></div>
+    </div>
+
+    <div class="compat-rel-card">
+      <div class="rel-num-circle" id="cr-relnum"></div>
+      <div>
+        <div class="rel-content-title">Relationship Number</div>
+        <div class="rel-content-text" id="cr-reltext"></div>
+      </div>
+    </div>
+
+    <div class="compat-analysis-card">
+      <h4 id="cr-analysis-title">Compatibility Analysis</h4>
+      <p id="cr-pair-text"></p>
+    </div>
+
+    <!-- Lo Shu Grid Compatibility Section -->
+    <div class="compat-loshu-section">
+      <h3>Lo Shu Grid Compatibility</h3>
+
+      <!-- Grid Trio: P1 | Combined | P2 -->
+      <div class="compat-grid-trio" id="cr-grid-trio"></div>
+
+      <!-- Gift Numbers -->
+      <div class="compat-gifts-card">
+        <h4>Gift Numbers — What Each Person Brings</h4>
+        <div id="cr-gifts"></div>
+      </div>
+
+      <!-- Complementarity Score -->
+      <div class="compat-comp-card">
+        <h4>Grid Complementarity</h4>
+        <div id="cr-comp"></div>
+      </div>
+
+      <!-- Dominant Planes -->
+      <div class="compat-planes-compat-card">
+        <h4>Dominant Planes</h4>
+        <div id="cr-planes-compat"></div>
+      </div>
+
+      <!-- Combined Arrows -->
+      <div class="compat-arrows-card">
+        <h4>Combined Lo Shu Arrows</h4>
+        <div id="cr-arrows"></div>
+      </div>
+
+      <!-- Combined Plane States with Upgrade Tracking -->
+      <div class="compat-plane-states-card">
+        <h4>Plane Upgrades Together</h4>
+        <div id="cr-plane-states"></div>
+      </div>
+
+      <!-- Key Relationship Numbers -->
+      <div class="compat-key-nums-card">
+        <h4>Key Relationship Numbers (2 · 6 · 9)</h4>
+        <div id="cr-key-nums"></div>
+      </div>
+    </div>
+
+  </div><!-- /#compat-result -->
+
 </div><!-- /.container -->
 
 <script>
@@ -647,6 +1348,47 @@ function esc(str) {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
+}
+
+const COLOR_MAP = {
+  'orange':       { bg: '#FF8C00', text: '#fff' },
+  'copper':       { bg: '#B87333', text: '#fff' },
+  'red':          { bg: '#DC143C', text: '#fff' },
+  'lilac':        { bg: '#C8A2C8', text: '#333' },
+  'yellow':       { bg: '#FFD700', text: '#333' },
+  'gold':         { bg: '#C9A84C', text: '#fff' },
+  'white':        { bg: '#F0F0F0', text: '#333', border: '1px solid #ccc' },
+  'salmon':       { bg: '#FA8072', text: '#fff' },
+  'rose':         { bg: '#E8426E', text: '#fff' },
+  'forest green': { bg: '#228B22', text: '#fff' },
+  'amber':        { bg: '#FFBF00', text: '#333' },
+  'wine red':     { bg: '#722F37', text: '#fff' },
+  'grey':         { bg: '#808080', text: '#fff' },
+  'blue':         { bg: '#3A6FD8', text: '#fff' },
+  'green':        { bg: '#2E8B2E', text: '#fff' },
+  'light brown':  { bg: '#C4A484', text: '#fff' },
+  'turquoise':    { bg: '#2AB5B5', text: '#fff' },
+  'pink':         { bg: '#FF69B4', text: '#fff' },
+  'mustard':      { bg: '#C9A200', text: '#fff' },
+  'navy blue':    { bg: '#1A237E', text: '#fff' },
+  'violet':       { bg: '#7B2FBE', text: '#fff' },
+  'magenta':      { bg: '#C2185B', text: '#fff' },
+  'purple':       { bg: '#6A1B9A', text: '#fff' },
+  'tan':          { bg: '#C49A6C', text: '#fff' },
+  'beige':        { bg: '#D4C5A9', text: '#333' },
+  'olive':        { bg: '#6B6B00', text: '#fff' },
+  'lavender':     { bg: '#9575CD', text: '#fff' },
+};
+
+function makeColorChips(colorsStr) {
+  return colorsStr.split(',').map(c => {
+    const name = c.trim().replace(/^and\s+/i, '');
+    const col = COLOR_MAP[name.toLowerCase()];
+    const style = col
+      ? `background:${col.bg};color:${col.text};${col.border ? 'border:' + col.border + ';' : ''}`
+      : 'background:var(--surface);border:1px solid var(--border);color:var(--text);';
+    return `<span class="color-chip" style="${style}">${esc(name)}</span>`;
+  }).join('');
 }
 
 function showError(msg) {
@@ -699,6 +1441,8 @@ function validateDob(dob) {
 document.addEventListener('DOMContentLoaded', () => {
   const today = new Date().toISOString().split('T')[0];
   document.getElementById('dob').setAttribute('max', today);
+  document.getElementById('cdob1').setAttribute('max', today);
+  document.getElementById('cdob2').setAttribute('max', today);
 
   // Real-time blur validation
   document.getElementById('name').addEventListener('blur', () => {
@@ -929,12 +1673,89 @@ function renderReport(d) {
     </div>
   `);
 
-  // ── 11. Career ──
+  // ── 11. Personal Month ──
+  const pmd = d.personal_month_data;
+  const forecast = d.monthly_forecast || [];
+  const curMonth = d.current_month;
+  const monthAbbr = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  window.__forecastData = forecast;
+  let forecastHtml = '<div class="forecast-grid">';
+  for (let i = 0; i < forecast.length; i++) {
+    const fc = forecast[i];
+    const isCur = fc.month_num === curMonth;
+    forecastHtml += `<div class="forecast-cell${isCur ? ' current-month fc-active' : ''}" onclick="toggleForecastDetail(this,${i})">
+      <div class="forecast-month-name">${monthAbbr[fc.month_num-1]}</div>
+      <div class="forecast-pm-num">${fc.personal_month}</div>
+    </div>`;
+  }
+  forecastHtml += '</div>';
+  // Pre-populate detail panel with current month — panel is visible by default
+  const curFc = forecast[curMonth - 1];
+  const curPmd = curFc.pm_data;
+  forecastHtml += `<div class="fc-detail-panel" id="fc-detail-panel">
+    <div class="fc-detail-heading">Personal Month ${curFc.personal_month} — ${esc(curFc.month_name)}</div>
+    <div class="pos-neg-grid">
+      <div class="pos-block"><strong>Positive Traits</strong>${esc(curPmd.positive)}</div>
+      <div class="neg-block"><strong>Watch Out For</strong>${esc(curPmd.negative)}</div>
+    </div>
+    <div style="margin-top:0.7rem;font-size:0.84rem;color:var(--text-muted);font-weight:600;">Tips for ${esc(curFc.month_name)}</div>
+    <p style="margin-top:0.25rem;font-size:0.88rem;">${esc(curPmd.tips)}</p>
+  </div>`;
+  sections.push(`
+    <div class="section-card">
+      <h3><span class="section-number">11</span> Personal Month ${esc(String(d.personal_month))} — ${esc(d.today_str)}</h3>
+      <div class="section-body">
+        <div style="margin-bottom:0.5rem;font-weight:600;font-size:0.88rem;color:var(--brown);">Monthly Forecast — ${esc(String(d.current_year))} <span style="font-weight:400;color:var(--text-muted);">(tap a month)</span></div>
+        ${forecastHtml}
+      </div>
+    </div>
+  `);
+
+  // ── 12. Personal Day ──
+  const dailyForecast = d.daily_forecast || [];
+  const todayDay = d.today_day;
+  window.__dailyForecast = dailyForecast;
+
+  let daysGridHtml = '<div class="days-grid">';
+  for (let i = 0; i < dailyForecast.length; i++) {
+    const df = dailyForecast[i];
+    const isToday = df.day === todayDay;
+    daysGridHtml += `<div class="day-cell${isToday ? ' today-day day-active' : ''}" onclick="toggleDayDetail(this,${i})">
+      <div class="day-num">${df.day}</div>
+      <div class="day-pd-num">PD ${df.personal_day}</div>
+    </div>`;
+  }
+  daysGridHtml += '</div>';
+
+  // Pre-populate with today's data
+  const todayDf = dailyForecast[todayDay - 1];
+  const todayPdd = todayDf.pd_data;
+  const todayColorChips = makeColorChips(todayPdd.lucky_colors);
+  daysGridHtml += `<div class="pd-detail-panel" id="pd-detail-panel">
+    <div class="pd-detail-heading">Personal Day ${todayDf.personal_day} — ${esc(String(todayDay))} ${esc(d.today_str.split(' ').slice(1).join(' '))}</div>
+    <p>${esc(todayPdd.text)}</p>
+    <div class="kv-row" style="margin-top:0.6rem;"><span class="kv-label">Social Style:</span></div>
+    <p style="margin-top:0.2rem;font-size:0.88rem;">${esc(todayPdd.social_hints)}</p>
+    <div class="kv-row" style="margin-top:0.5rem;"><span class="kv-label">Lucky Colours:</span></div>
+    <div class="color-chips">${todayColorChips}</div>
+  </div>`;
+
+  sections.push(`
+    <div class="section-card">
+      <h3><span class="section-number">12</span> Personal Day ${esc(String(d.personal_day))} — ${esc(d.today_str)}</h3>
+      <div class="section-body">
+        <div style="margin-bottom:0.3rem;font-weight:600;font-size:0.88rem;color:var(--brown);">Days of ${esc(d.today_str.split(' ').slice(1).join(' '))} <span style="font-weight:400;color:var(--text-muted);">(tap a day)</span></div>
+        ${daysGridHtml}
+      </div>
+    </div>
+  `);
+
+  // ── 13. Career ──
   const car = d.career;
   const fields = car.fields.split(',').map(f => `<span class="tag">${esc(f.trim())}</span>`).join('');
   sections.push(`
     <div class="section-card">
-      <h3><span class="section-number">11</span> Career — Mulank ${esc(fmtNum(d.mulank))} + Bhagyank ${esc(fmtNum(d.bhagyank))}</h3>
+      <h3><span class="section-number">13</span> Career — Mulank ${esc(fmtNum(d.mulank))} + Bhagyank ${esc(fmtNum(d.bhagyank))}</h3>
       <div class="section-body">
         <p>${esc(car.general)}</p>
         <div class="kv-row" style="margin-top:0.6rem;"><span class="kv-label">Recommended Fields:</span></div>
@@ -945,7 +1766,7 @@ function renderReport(d) {
     </div>
   `);
 
-  // ── 12. Lo Shu Grid ──
+  // ── 14. Lo Shu Grid ──
   const grid = d.grid;
   const loshuRows = [[4,9,2],[3,5,7],[8,1,6]];
   let gridHtml = '<table class="loshu-table">';
@@ -975,17 +1796,77 @@ function renderReport(d) {
     interpsHtml += '</div>';
   }
 
+  // Planes
+  const planes = d.planes_analysis || [];
+  let planesHtml = '';
+  if (planes.length > 0) {
+    planesHtml = '<div style="margin-top:1.2rem;font-weight:700;font-size:0.9rem;color:var(--brown);">Planes Analysis</div>';
+    planesHtml += '<div class="planes-grid">';
+    for (const p of planes) {
+      const badgeLabel = {strong:'Complete', partial:'Partial', absent:'Absent'}[p.status] || '';
+      planesHtml += `<div class="plane-cell ${p.status}">
+        <div class="plane-name">${esc(p.name)}</div>
+        <div class="plane-nums">${p.numbers.join(' · ')}</div>
+        <span class="plane-badge ${p.status}">${badgeLabel}</span>
+      </div>`;
+    }
+    planesHtml += '</div>';
+  }
+
+  // Arrows
+  const strengthArrows = d.strength_arrows || [];
+  const isolationArrows = d.isolation_arrows || [];
+  let arrowsHtml = '';
+  if (strengthArrows.length > 0) {
+    arrowsHtml += '<div class="arrows-wrap"><div class="arrows-heading">&#9650; Arrows of Strength</div>';
+    for (const a of strengthArrows) {
+      arrowsHtml += `<div class="arrow-card strength">
+        <div class="arrow-name">${esc(a.name)}</div>
+        <div class="arrow-nums">${a.numbers.join(' – ')}</div>
+        <div class="arrow-text">${esc(a.text)}</div>
+      </div>`;
+    }
+    arrowsHtml += '</div>';
+  }
+  if (isolationArrows.length > 0) {
+    arrowsHtml += '<div class="arrows-wrap"><div class="arrows-heading">&#9660; Arrows of Isolation</div>';
+    for (const a of isolationArrows) {
+      arrowsHtml += `<div class="arrow-card isolation">
+        <div class="arrow-name">${esc(a.name)}</div>
+        <div class="arrow-nums">${a.numbers.join(' – ')}</div>
+        <div class="arrow-text">${esc(a.text)}</div>
+      </div>`;
+    }
+    arrowsHtml += '</div>';
+  }
+
+  // Special Combinations
+  const combos = d.detected_combos || [];
+  let combosHtml = '';
+  if (combos.length > 0) {
+    combosHtml = '<div style="margin-top:1.2rem;font-weight:700;font-size:0.9rem;color:var(--brown);">Special Combinations in Your Grid</div>';
+    for (const c of combos) {
+      combosHtml += `<div class="combo-card">
+        <div class="combo-label">${esc(c.label)}</div>
+        <div class="combo-text">${esc(c.text)}</div>
+      </div>`;
+    }
+  }
+
   sections.push(`
     <div class="section-card">
-      <h3><span class="section-number">12</span> Lo Shu Grid</h3>
+      <h3><span class="section-number">14</span> Lo Shu Grid</h3>
       <div class="section-body">
         <div class="loshu-grid-wrap">${gridHtml}</div>
         ${interpsHtml}
+        ${planesHtml}
+        ${arrowsHtml}
+        ${combosHtml}
       </div>
     </div>
   `);
 
-  // ── 13. Missing Numbers ──
+  // ── 15. Missing Numbers ──
   const missing = d.missing || [];
   const missingData = d.missing_data || {};
   let missingContent = '';
@@ -1017,8 +1898,56 @@ function renderReport(d) {
 
   sections.push(`
     <div class="section-card">
-      <h3><span class="section-number">13</span> Missing Numbers — Impact &amp; Remedy</h3>
+      <h3><span class="section-number">15</span> Missing Numbers — Impact &amp; Remedy</h3>
       <div class="section-body">${missingContent}</div>
+    </div>
+  `);
+
+  // ── 16. Pinnacle Numbers ──
+  const pins = d.pinnacle_list || [];
+  let pinsHtml = `<p style="font-size:0.84rem;color:var(--text-muted);margin-bottom:0.7rem;">Based on your current age (${esc(String(d.current_age))}). The active pinnacle is highlighted.</p>`;
+  pinsHtml += '<div class="pin-grid">';
+  for (const p of pins) {
+    const pd = p.data;
+    pinsHtml += `<div class="pin-card${p.is_active ? ' active' : ''}">
+      ${p.is_active ? '<span class="active-label">&#9679; NOW</span>' : ''}
+      <div class="pin-card-badge">Pinnacle ${p.number}</div>
+      <div class="pin-card-num">${p.pinnacle}</div>
+      <div class="pin-card-title">${esc(pd.title)}</div>
+      <div class="pin-card-age">Age ${esc(p.age_range)}</div>
+      <div class="pin-card-text">${esc(pd.text)}</div>
+      <div class="pin-card-themes"><strong>Themes:</strong> ${esc(pd.themes)}</div>
+      <div class="pin-card-advice">${esc(pd.advice)}</div>
+    </div>`;
+  }
+  pinsHtml += '</div>';
+  sections.push(`
+    <div class="section-card">
+      <h3><span class="section-number">16</span> Pinnacle Numbers</h3>
+      <div class="section-body">${pinsHtml}</div>
+    </div>
+  `);
+
+  // ── 17. Challenge Numbers ──
+  const chals = d.challenge_list || [];
+  let chalsHtml = `<p style="font-size:0.84rem;color:var(--text-muted);margin-bottom:0.7rem;">The Main Challenge (C3) is a lifetime lesson. Others align with your current life phase.</p>`;
+  chalsHtml += '<div class="challenge-grid">';
+  for (const c of chals) {
+    const cd = c.data;
+    chalsHtml += `<div class="chal-card${c.is_main ? ' main-challenge' : ''}">
+      ${c.is_main ? '<span class="active-label" style="color:var(--brown);">&#9733; LIFETIME</span>' : ''}
+      <div class="chal-card-badge">${esc(c.label)}</div>
+      <div class="chal-card-num">${c.challenge}</div>
+      <div class="chal-card-title">${esc(cd.title)}</div>
+      <div class="chal-card-text">${esc(cd.text)}</div>
+      <div class="chal-card-lesson"><strong>Life Lesson:</strong> ${esc(cd.lesson)}</div>
+    </div>`;
+  }
+  chalsHtml += '</div>';
+  sections.push(`
+    <div class="section-card">
+      <h3><span class="section-number">17</span> Challenge Numbers</h3>
+      <div class="section-body">${chalsHtml}</div>
     </div>
   `);
 
@@ -1026,6 +1955,49 @@ function renderReport(d) {
   document.getElementById('sections').innerHTML = sections.join('');
   document.getElementById('report').style.display = 'block';
   document.getElementById('report').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ── Monthly Forecast Expand ───────────────────────────────────────────────────
+function toggleForecastDetail(cell, idx) {
+  const panel = document.getElementById('fc-detail-panel');
+  const allCells = cell.closest('.forecast-grid').querySelectorAll('.forecast-cell');
+
+  allCells.forEach(c => c.classList.remove('fc-active'));
+  cell.classList.add('fc-active');
+
+  const fc = window.__forecastData[idx];
+  const pmd = fc.pm_data;
+  panel.innerHTML = `
+    <div class="fc-detail-heading">Personal Month ${fc.personal_month} — ${esc(fc.month_name)}</div>
+    <div class="pos-neg-grid">
+      <div class="pos-block"><strong>Positive Traits</strong>${esc(pmd.positive)}</div>
+      <div class="neg-block"><strong>Watch Out For</strong>${esc(pmd.negative)}</div>
+    </div>
+    <div style="margin-top:0.7rem;font-size:0.84rem;color:var(--text-muted);font-weight:600;">Tips for ${esc(fc.month_name)}</div>
+    <p style="margin-top:0.25rem;font-size:0.88rem;">${esc(pmd.tips)}</p>
+  `;
+}
+
+// ── Personal Day Expand ───────────────────────────────────────────────────────
+function toggleDayDetail(cell, idx) {
+  const panel = document.getElementById('pd-detail-panel');
+  const allCells = cell.closest('.days-grid').querySelectorAll('.day-cell');
+
+  allCells.forEach(c => c.classList.remove('day-active'));
+  cell.classList.add('day-active');
+
+  const df = window.__dailyForecast[idx];
+  const pdd = df.pd_data;
+  const colorChips = makeColorChips(pdd.lucky_colors);
+
+  panel.innerHTML = `
+    <div class="pd-detail-heading">Personal Day ${df.personal_day} — Day ${df.day}</div>
+    <p>${esc(pdd.text)}</p>
+    <div class="kv-row" style="margin-top:0.6rem;"><span class="kv-label">Social Style:</span></div>
+    <p style="margin-top:0.2rem;font-size:0.88rem;">${esc(pdd.social_hints)}</p>
+    <div class="kv-row" style="margin-top:0.5rem;"><span class="kv-label">Lucky Colours:</span></div>
+    <div class="color-chips">${colorChips}</div>
+  `;
 }
 
 // ── Collapsible Remedy ────────────────────────────────────────────────────────
@@ -1045,6 +2017,314 @@ document.addEventListener('keydown', function(e) {
     }
   }
 });
+
+// ── Mode Switcher ─────────────────────────────────────────────────────────────
+let currentMode = 'individual';
+
+function switchMode(mode) {
+  currentMode = mode;
+  document.getElementById('individual-form').style.display = mode === 'individual' ? '' : 'none';
+  document.getElementById('compat-form').style.display     = mode === 'compat'     ? '' : 'none';
+  document.getElementById('tab-individual').classList.toggle('active', mode === 'individual');
+  document.getElementById('tab-compat').classList.toggle('active', mode === 'compat');
+  // Hide results from the other mode
+  if (mode === 'individual') {
+    document.getElementById('compat-result').style.display = 'none';
+  } else {
+    document.getElementById('report').style.display = 'none';
+    document.getElementById('spinner').style.display = 'none';
+  }
+}
+
+// ── Compatibility Helpers ─────────────────────────────────────────────────────
+function scoreLabel(pct) {
+  if (pct >= 80) return 'Excellent ✨';
+  if (pct >= 65) return 'Good 👍';
+  if (pct >= 45) return 'Moderate 🤝';
+  return 'Challenging ⚡';
+}
+
+function scoreBarColor(score9) {
+  if (score9 >= 8) return '#4caf50';
+  if (score9 >= 6) return '#8bc34a';
+  if (score9 >= 4) return '#ff9800';
+  return '#f44336';
+}
+
+function scoreLabelShort(score9) {
+  if (score9 >= 8) return 'Excellent';
+  if (score9 >= 6) return 'Good';
+  if (score9 >= 4) return 'Moderate';
+  return 'Challenging';
+}
+
+function personCardHTML(p) {
+  return `
+    <h4>${esc(p.name)}</h4>
+    <div class="cp-dob">DOB: ${esc(p.dob)}</div>
+    <div class="cp-row"><span class="cp-key">Birth Number (Mulank)</span><span class="cp-val">${esc(String(p.mulank_key))} — ${esc(p.mulank_planet)}</span></div>
+    <div class="cp-row"><span class="cp-key">Destiny Number (Bhagyank)</span><span class="cp-val">${esc(String(p.bhagyank_key))} — ${esc(p.bhagyank_planet)}</span></div>
+    <div class="cp-row"><span class="cp-key">Name Number</span><span class="cp-val">${esc(String(p.nn_key))}</span></div>
+  `;
+}
+
+function scoreBarsHTML(scores) {
+  const rows = [
+    { label: 'Birth Number (Mulank)', score: scores.mulank },
+    { label: 'Destiny (Bhagyank)', score: scores.bhagyank },
+    { label: 'Name Vibration', score: scores.name_number },
+  ];
+  return rows.map(r => {
+    const pct = Math.round(r.score / 9 * 100);
+    const color = scoreBarColor(r.score);
+    return `
+      <div class="score-bar-row">
+        <div class="sbr-label">${esc(r.label)}</div>
+        <div class="sbr-track"><div class="sbr-fill" style="width:${pct}%;background:${color};"></div></div>
+        <div class="sbr-score">${r.score}/9 <span style="color:${color};font-size:0.75rem;">${scoreLabelShort(r.score)}</span></div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderCompatResult(data) {
+  document.getElementById('cr-name1').textContent = data.person1.name;
+  document.getElementById('cr-name2').textContent = data.person2.name;
+
+  const pct = data.scores.overall_pct;
+  document.getElementById('cr-pct').textContent = pct + '%';
+  document.getElementById('cr-label').textContent = scoreLabel(pct);
+  setTimeout(() => {
+    document.getElementById('cr-bar').style.width = pct + '%';
+  }, 50);
+
+  document.getElementById('cr-card1').innerHTML = personCardHTML(data.person1);
+  document.getElementById('cr-card2').innerHTML = personCardHTML(data.person2);
+  document.getElementById('cr-bars').innerHTML = scoreBarsHTML(data.scores);
+
+  document.getElementById('cr-relnum').textContent = data.relationship_number;
+  document.getElementById('cr-reltext').textContent = data.relationship_text;
+
+  const mk1 = data.person1.mulank_key, mk2 = data.person2.mulank_key;
+  document.getElementById('cr-analysis-title').textContent =
+    `Compatibility Analysis (Birth Numbers ${mk1} & ${mk2})`;
+  document.getElementById('cr-pair-text').textContent = data.pair_text;
+
+  if (data.loshu_compat) renderLoShuCompat(data.loshu_compat, data.person1, data.person2);
+
+  document.getElementById('compat-result').style.display = 'block';
+  document.getElementById('compat-result').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ── Lo Shu Compat Rendering ───────────────────────────────────────────────────
+function loShuMiniGrid(grid, showOverloaded) {
+  const rows = [[4,9,2],[3,5,7],[8,1,6]];
+  let html = '<table class="lm-table">';
+  for (const row of rows) {
+    html += '<tr>';
+    for (const n of row) {
+      const count = grid[String(n)] ?? 0;
+      let cls;
+      if (count === 0) cls = 'lm-absent';
+      else if (showOverloaded && count >= 3) cls = 'lm-overloaded';
+      else cls = 'lm-present';
+      const inner = count <= 1 ? n : `${n}<span class="lm-cnt">×${count}</span>`;
+      html += `<td class="${cls}">${inner}</td>`;
+    }
+    html += '</tr>';
+  }
+  return html + '</table>';
+}
+
+function renderLoShuCompat(lc, p1, p2) {
+  // 1. Grid Trio
+  const trioEl = document.getElementById('cr-grid-trio');
+  if (trioEl) {
+    trioEl.innerHTML = `
+      <div class="cgrid-item">
+        <div class="cgrid-item-title">Person 1</div>
+        <div class="cgrid-item-name">${esc(p1.name)}</div>
+        ${loShuMiniGrid(lc.grid1, false)}
+      </div>
+      <div class="cgrid-item" style="border-color:rgba(245,166,35,0.55);border-width:2px;">
+        <div class="cgrid-item-title">Combined Grid</div>
+        <div class="cgrid-item-name">Together</div>
+        ${loShuMiniGrid(lc.combined, true)}
+      </div>
+      <div class="cgrid-item">
+        <div class="cgrid-item-title">Person 2</div>
+        <div class="cgrid-item-name">${esc(p2.name)}</div>
+        ${loShuMiniGrid(lc.grid2, false)}
+      </div>`;
+  }
+
+  // 2. Gift Numbers
+  const giftsEl = document.getElementById('cr-gifts');
+  if (giftsEl) {
+    const gq = lc.gift_qualities;
+    const chips = (nums, cls) => nums.length
+      ? nums.map(n => `<span class="gift-chip ${cls}"><span class="gnum">${n}</span>&nbsp;${esc(gq[String(n)] || '')}</span>`).join('')
+      : '<span style="font-size:0.78rem;color:var(--text-light);font-style:italic;">None</span>';
+    giftsEl.innerHTML = `
+      <div class="gift-row">
+        <div class="gift-row-label">${esc(p1.name)} gifts to ${esc(p2.name)}</div>
+        <div class="gift-chips">${chips(lc.gifts_1_to_2, '')}</div>
+      </div>
+      <div class="gift-row">
+        <div class="gift-row-label">${esc(p2.name)} gifts to ${esc(p1.name)}</div>
+        <div class="gift-chips">${chips(lc.gifts_2_to_1, '')}</div>
+      </div>
+      <div class="gift-row">
+        <div class="gift-row-label">Shared strengths (both carry)</div>
+        <div class="gift-chips">${chips(lc.shared_present, 'shared-present')}</div>
+      </div>
+      <div class="gift-row" style="margin-bottom:0">
+        <div class="gift-row-label">Shared gaps (both missing)</div>
+        <div class="gift-chips">${chips(lc.shared_missing, 'missing')}</div>
+      </div>`;
+  }
+
+  // 3. Complementarity
+  const compEl = document.getElementById('cr-comp');
+  if (compEl) {
+    const barRow = (label, pct) =>
+      `<div class="comp-bar-wrap">
+        <div class="comp-bar-label">${label}</div>
+        <div class="comp-bar-track"><div class="comp-bar-fill" style="width:${pct}%"></div></div>
+        <div class="comp-bar-pct">${pct}%</div>
+      </div>`;
+    const completeTxt = lc.combined_unique === 9
+      ? ' — a <strong style="color:#27ae60">complete grid!</strong>' : '';
+    compEl.innerHTML =
+      barRow(`${esc(p1.name)} fills ${esc(p2.name)}'s gaps`, lc.comp_p1_pct) +
+      barRow(`${esc(p2.name)} fills ${esc(p1.name)}'s gaps`, lc.comp_p2_pct) +
+      barRow('Overall complementarity', lc.overall_comp_pct) +
+      `<p style="margin-top:0.6rem;font-size:0.82rem;color:var(--text-light);">Together you cover
+        <strong style="color:var(--brown)">${lc.combined_unique}</strong> of 9 numbers${completeTxt}.</p>`;
+  }
+
+  // 4. Dominant Planes
+  const plCompEl = document.getElementById('cr-planes-compat');
+  if (plCompEl) {
+    plCompEl.innerHTML = `
+      <div style="display:flex;gap:1.2rem;margin-bottom:0.8rem;flex-wrap:wrap;">
+        <div><span style="font-size:0.72rem;color:var(--text-light);font-weight:700;text-transform:uppercase;">Dominant Plane</span><br>
+          <span style="font-weight:700;color:var(--brown)">${esc(p1.name)}: ${esc(lc.dominant_plane_1)}</span></div>
+        <div><span style="font-size:0.72rem;color:var(--text-light);font-weight:700;text-transform:uppercase;">Dominant Plane</span><br>
+          <span style="font-weight:700;color:var(--brown)">${esc(p2.name)}: ${esc(lc.dominant_plane_2)}</span></div>
+      </div>
+      <p style="font-size:0.88rem;line-height:1.65;">${esc(lc.plane_compat_text)}</p>`;
+  }
+
+  // 5. Combined Arrows
+  const arrowsEl = document.getElementById('cr-arrows');
+  if (arrowsEl) {
+    const group = (items, cls, label) => items.length ? `
+      <div class="arrow-state-group">
+        <div class="arrow-state-label ${cls}">${label}</div>
+        <div class="arrow-badges">${items.map(a => `<span class="arrow-badge ${cls}">${esc(a)}</span>`).join('')}</div>
+      </div>` : '';
+    const content =
+      group(lc.arrows_new,       'new',       '✦ Formed Together') +
+      group(lc.arrows_sustained, 'sustained', '◆ Sustained') +
+      group(lc.arrows_absent,    'absent',    '○ Still Absent');
+    arrowsEl.innerHTML = content ||
+      '<p style="font-size:0.82rem;color:var(--text-light);font-style:italic;">No arrows active in this combination.</p>';
+  }
+
+  // 6. Plane States with Upgrade Tracking
+  const psEl = document.getElementById('cr-plane-states');
+  if (psEl) {
+    const badge = s => `<span class="pstate-badge ${s}">${s}</span>`;
+    psEl.innerHTML = lc.planes.map(pl =>
+      `<div class="plane-state-row">
+        <span class="plane-name">${esc(pl.name)}</span>
+        <div class="plane-states-row">
+          ${badge(pl.state_p1)} + ${badge(pl.state_p2)} → ${badge(pl.state_combined)}
+          ${pl.upgraded ? '<span class="upgrade-arrow">↑</span>' : ''}
+        </div>
+      </div>`).join('');
+  }
+
+  // 7. Key Relationship Numbers
+  const knEl = document.getElementById('cr-key-nums');
+  if (knEl) {
+    knEl.innerHTML = [2, 6, 9].map(n => {
+      const kn = lc.key_nums[String(n)];
+      if (!kn) return '';
+      const statusColor = kn.combined > 0 ? '#27ae60' : 'var(--text-light)';
+      const statusTxt   = kn.combined > 0 ? `Present (×${kn.combined})` : 'Absent in relationship';
+      return `<div class="key-num-row">
+        <div class="key-num-circle">${n}</div>
+        <div class="key-num-info">
+          <div class="key-num-title">${n} — ${esc(kn.planet)}</div>
+          <div class="key-num-theme">${esc(kn.theme)}</div>
+        </div>
+        <div class="key-num-counts">
+          <div>P1:&nbsp;${kn.p1}&nbsp;&nbsp;P2:&nbsp;${kn.p2}</div>
+          <div style="color:${statusColor};font-weight:700;">${statusTxt}</div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+}
+
+// ── Check Compatibility ───────────────────────────────────────────────────────
+function showCompatError(msg) {
+  const el = document.getElementById('compat-error');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+function hideCompatError() {
+  document.getElementById('compat-error').style.display = 'none';
+}
+
+async function checkCompatibility() {
+  hideCompatError();
+  const name1 = document.getElementById('cname1').value.trim();
+  const dob1  = document.getElementById('cdob1').value.trim();
+  const name2 = document.getElementById('cname2').value.trim();
+  const dob2  = document.getElementById('cdob2').value.trim();
+
+  // Simple validation
+  let hasError = false;
+  const fields = [
+    { id: 'cname1', errId: 'cname1-error', val: name1, fn: validateName },
+    { id: 'cdob1',  errId: 'cdob1-error',  val: dob1,  fn: validateDob },
+    { id: 'cname2', errId: 'cname2-error', val: name2, fn: validateName },
+    { id: 'cdob2',  errId: 'cdob2-error',  val: dob2,  fn: validateDob },
+  ];
+  fields.forEach(f => {
+    const err = f.fn(f.val);
+    setFieldError(f.id, f.errId, err);
+    if (err) hasError = true;
+  });
+  if (hasError) return;
+
+  const btn = document.getElementById('btn-compat');
+  btn.disabled = true;
+  btn.textContent = 'Calculating...';
+  document.getElementById('compat-result').style.display = 'none';
+
+  try {
+    const res = await fetch('/check-compatibility', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name1, dob1, name2, dob2 }),
+    });
+    const data = await res.json();
+    if (!res.ok || data.error) {
+      showCompatError(data.error || 'Failed to check compatibility. Please try again.');
+      return;
+    }
+    renderCompatResult(data);
+  } catch (e) {
+    showCompatError('Network error. Please check your connection and try again.');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '&#10084; Check Compatibility';
+  }
+}
 </script>
 
 </body>

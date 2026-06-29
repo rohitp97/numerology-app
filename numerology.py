@@ -97,11 +97,47 @@ def get_loshu_grid(day: int, month: int, year: int) -> dict:
     bhagyank_digit = reduce_number(bhagyank, keep_master=False)
     if 1 <= bhagyank_digit <= 9:
         counts[bhagyank_digit] += 1
+    # Include Mulank in the grid — reduced to single digit
+    mulank_digit = reduce_number(get_mulank(day), keep_master=False)
+    if 1 <= mulank_digit <= 9:
+        counts[mulank_digit] += 1
     return counts
 
 
 def get_missing_numbers(grid: dict) -> list:
     return [n for n in range(1, 10) if grid[n] == 0]
+
+
+def get_pinnacles(day: int, month: int, year: int) -> list:
+    """Return [P1, P2, P3, P4] — all reduced to single digit."""
+    rd = reduce_number(day, keep_master=False)
+    ry = reduce_number(sum(int(d) for d in str(year)), keep_master=False)
+    p1 = reduce_number(month + rd, keep_master=False)
+    p2 = reduce_number(rd + ry, keep_master=False)
+    p3 = reduce_number(p1 + p2, keep_master=False)
+    p4 = reduce_number(month + ry, keep_master=False)
+    return [p1, p2, p3, p4]
+
+
+def get_challenges(day: int, month: int, year: int) -> list:
+    """Return [C1, C2, C3 (main), C4] — absolute differences, 0–8."""
+    rd = reduce_number(day, keep_master=False)
+    ry = reduce_number(sum(int(d) for d in str(year)), keep_master=False)
+    c1 = abs(month - rd)
+    c2 = abs(rd - ry)
+    c3 = abs(c1 - c2)
+    c4 = abs(month - ry)
+    return [c1, c2, c3, c4]
+
+
+def get_personal_month(personal_year: int, calendar_month: int) -> int:
+    """Personal Month = Personal Year + calendar month, always single digit."""
+    return reduce_number(personal_year + calendar_month, keep_master=False)
+
+
+def get_personal_day(personal_month: int, calendar_day: int) -> int:
+    """Personal Day = Personal Month + calendar day, always single digit."""
+    return reduce_number(personal_month + calendar_day, keep_master=False)
 
 
 def calculate_all(name: str, day: int, month: int, year: int) -> dict:

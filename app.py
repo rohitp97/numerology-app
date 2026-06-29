@@ -1,8 +1,9 @@
 from flask import Flask, render_template, request, jsonify, make_response
 from datetime import date
+import calendar
 import io
 
-from numerology import calculate_all
+from numerology import calculate_all, get_personal_month, get_personal_day, get_pinnacles, get_challenges
 
 app = Flask(__name__)
 
@@ -250,6 +251,220 @@ PERSONAL_YEAR_DATA = {
     },
 }
 
+# ── Personal Month Data ────────────────────────────────────────────────────────
+PERSONAL_MONTH_DATA = {
+    1: {
+        "positive": "Elevated levels of energy, strong determination, fresh prospects, burgeoning connections, wedlock, innovative and fruitful concepts, relocations, autonomy, action-driven, diverse streams of income, aspiration, and guidance.",
+        "negative": "Aggressive, quarrelsome, careless, impatient, distressed, and suspicious.",
+        "tips": "Embark on a new venture. Champion your unique ideas. Follow your instincts. Now is an opportune moment to seek assistance. Request a salary increase from your employer. Take action. Bring about that desired change. Submit an application for that fresh position. Promote yourself. Your success hinges on your drive. Embrace independence, assertiveness, and enthusiasm. Make swift decisions. Initiatives launched now will advance rapidly."
+    },
+    2: {
+        "positive": "Amicable, affectionate, collaborative, tactful, unassuming, investigative, diplomatic, and perceptive.",
+        "negative": "Temperamental, theatrical, emotional instability, dishonest, health issues, and anxiety.",
+        "tips": "Embrace the role of a peacemaker. Employ diplomacy and tact to strengthen and harmonize friendships. Now is the opportune moment to gather what is rightfully owed to you. Avoid engaging in arguments. Strive to understand the other person's perspective. Show receptiveness, tolerance, and a good-natured attitude, radiating peace and harmony. Today is favorable for accumulation and analysis."
+    },
+    3: {
+        "positive": "Charming, creative, entertainer, communicative, journeying, joyful, motivating, forging new friendships, and reuniting with old acquaintances.",
+        "negative": "Self-centeredness, rumors, lack of focus, extravagant spending.",
+        "tips": "Amuse your friends or business associates. Radiate charm and happiness to bring joy to others. Embrace your sense of humor. Express your creativity through writing, acting, painting, or music. Adopt a flexible attitude and embrace life as it unfolds. Indulge in enjoyable activities like playing bridge, golf, dancing, or attending the theatre."
+    },
+    4: {
+        "positive": "Diligent, focused, pragmatic, systematic, and reliable.",
+        "negative": "Lack of energy, stressed, inflexible, sluggish, and prone to frustration.",
+        "tips": "Focus on and streamline your work, putting forth every effort to handle it methodically and efficiently. Practice thriftiness by initiating a bank account. Allocate time for routine and detailed tasks. Exercise self-discipline. Avoid beginning any new ventures. Accomplishing work with excellence will bring great satisfaction."
+    },
+    5: {
+        "positive": "Sociable, advancement, career growth, adaptable, industrious, versatile, freedom-seeking, and pliable.",
+        "negative": "Lacking focus, indifferent, erratic, and undependable.",
+        "tips": "Spark the public's interest. Take swift action in an innovative manner. Spread enthusiasm by endorsing fresh concepts. Now is a propitious period to interact with the opposite sex. It's a favorable time for travel, buying, or selling goods. Embrace new opportunities with confidence, guided by your intuition."
+    },
+    6: {
+        "positive": "Affection, matrimony, romantic, artistic, sociable, affectionate, considerate, caring, and harmonious.",
+        "negative": "Unwilling to adapt, resistant to change, disagreements, self-centered, and volatile.",
+        "tips": "Embrace responsibilities with grace. Enhance the environment at home, in the office, and within the community. Seek harmony and make adjustments for the comfort and happiness of all. Offer advice willingly but only when requested. This is a favorable period for purchasing, building, or leasing a home. Avoid engaging in unnecessary arguments."
+    },
+    7: {
+        "positive": "Detail-oriented, economic security, insightful, contemplative, charismatic, and inquisitive. The middle of the month brings favorable circumstances.",
+        "negative": "Quick-tempered, introverted, uncertain, and envious. Refrain from initiating new endeavors.",
+        "tips": "Refine and perfect everything you are working on; add the final touches. Allocate some time for solitude — rest, relaxation, and focused contemplation. Pay heed to your intuitive inner voice. Avoid entering into partnerships on a 50-50 basis. This is a spiritually oriented time, and material success may not be at its peak."
+    },
+    8: {
+        "positive": "Assertive, advancements, financial ventures, effective, courteous, benevolent, favorable outcomes from speculations, gains from real estate.",
+        "negative": "Boisterous, covetous, and deceitful.",
+        "tips": "Secure significant contracts and exude the aura of a powerful business executive. This period is ideal for executive-level decision-making, business expansion, and progress. Engage with major corporations or financial institutions. Consider investing in stable and reputable securities. Render substantial services, and you will reap bountiful rewards."
+    },
+    9: {
+        "positive": "Compassionate, open-minded, secluded, fresh acquaintances, journeys of significance, and forgiving.",
+        "negative": "Unmindful, ongoing disputes, hasty, unfeeling, distant, and criminal behavior.",
+        "tips": "Assess your belongings and organize unfinished tasks, preparing for a fresh start tomorrow. Foster universal love and fraternity. Seek aspects to admire, appreciate, or praise in others. Resolve conflicts and take responsibility for any lingering challenges. This is an excellent period to embark on a long journey and foster meaningful connections."
+    },
+}
+
+# ── Personal Day Data ──────────────────────────────────────────────────────────
+PERSONAL_DAY_DATA = {
+    1: {
+        "text": "The day brimming with fresh aspirations, crafting novel strategies, and putting them into action.",
+        "social_hints": "Embrace uniqueness and originality in your attire. Consider donning stripes and plaids to add a touch of individuality to your outfit.",
+        "lucky_colors": "Orange, Copper, Red, and Lilac"
+    },
+    2: {
+        "text": "On this day, you have the opportunity to enhance your plans while managing your emotions and being mindful of any tendency to become overly sensitive.",
+        "social_hints": "Maintain a calm, sophisticated, and reserved demeanor. Opt for subdued colors, but consider wearing yellow to uplift your spirits when feeling down.",
+        "lucky_colors": "Yellow, Gold, White, and Salmon"
+    },
+    3: {
+        "text": "Indulge in a day of shopping, clubbing, and partying, savoring every moment to the fullest. It's a favorable period for exploring your creative side and seeking entertainment.",
+        "social_hints": "Prioritize comfort over style when dressing. Opt for clothing with lace, frills, and jewelry to accentuate your look. Choose pleasing and soft materials.",
+        "lucky_colors": "Rose, Forest Green, Amber, and Wine Red"
+    },
+    4: {
+        "text": "Today presents a favorable opportunity for real estate transactions. Additionally, trading activities have the potential to be quite profitable.",
+        "social_hints": "Adopt a conservative, tidy, and precise dressing style. Opt for clothing with straight lines and dark colors.",
+        "lucky_colors": "Grey, Blue, Green, Light Brown, and Turquoise"
+    },
+    5: {
+        "text": "Prepare yourself for unforeseen adventures, travel, and fresh opportunities. It is also an auspicious period for promoting new and innovative ideas.",
+        "social_hints": "Embrace the role of a fashion trendsetter, donning sports attire. Cultivate your wit and sparkle as a captivating conversationalist.",
+        "lucky_colors": "Pink, Blue, Red, and Turquoise"
+    },
+    6: {
+        "text": "Today is dedicated to domestic affairs and responsibilities. However, refraining from engaging in arguments will work in your favor.",
+        "social_hints": "Prioritize comfort over style in your attire, and opt for artistic clothes with soft lines. This is a time to focus on domestic matters.",
+        "lucky_colors": "Yellow, Mustard, Red, and Navy Blue"
+    },
+    7: {
+        "text": "Today is dedicated to nurturing your spiritual and mental well-being. Take time to rest and prioritize your health.",
+        "social_hints": "Exude an air of reservation, refinement, and unapproachability. Dress in exclusive clothes with exquisite and distinct designs, favoring pastel colors.",
+        "lucky_colors": "Violet, Magenta, Purple, and Turquoise"
+    },
+    8: {
+        "text": "Today holds a higher likelihood of receiving delayed cheques, payments, or long-awaited good news. Material rewards and happiness may come your way on this day.",
+        "social_hints": "Present an image of wealth and influence. Establish connections with prominent individuals. Purchase clothing that exudes a sense of luxury.",
+        "lucky_colors": "Blue, Tan, Gold, Beige, and Grey"
+    },
+    9: {
+        "text": "Make the most of this day by indulging in your favorite music, tidying up the house, and resolving any lingering issues with others.",
+        "social_hints": "This is a time for love and affection. Perform a kind deed, and your rewards will multiply. Embrace a charming and lovable demeanor.",
+        "lucky_colors": "Green, White, Red, Olive, Gold, and Lavender"
+    },
+}
+
+# ── Lo Shu Arrows ──────────────────────────────────────────────────────────────
+LOSHU_ARROWS = [
+    {
+        "name": "Arrow of Intellect",
+        "numbers": [4, 9, 2],
+        "strength": "A sharp and analytical mind. You possess intellectual brilliance and a strong memory. Learning comes naturally, and you excel in research and problem-solving.",
+        "isolation": "Concentration and academic study may require extra effort. Patience and regular mental exercises will strengthen your intellectual abilities over time."
+    },
+    {
+        "name": "Arrow of Will",
+        "numbers": [3, 5, 7],
+        "strength": "Exceptional determination and willpower. Once you set your sights on a goal, you pursue it with unwavering focus. Obstacles only strengthen your resolve.",
+        "isolation": "Prone to self-doubt and wavering decisions. Developing clear, written goals and daily commitment practices is a transformative life lesson for you."
+    },
+    {
+        "name": "Arrow of Activity",
+        "numbers": [8, 1, 6],
+        "strength": "Naturally active and practical. You thrive on turning ideas into reality through direct, sustained action. Inactivity is uncomfortable for you.",
+        "isolation": "There may be a tendency to overthink rather than act. Success comes when you consciously push yourself to take concrete, consistent steps forward."
+    },
+    {
+        "name": "Arrow of Practicality",
+        "numbers": [4, 3, 8],
+        "strength": "Highly skilled at manual, physical, and hands-on tasks. Grounded, hardworking, with an exceptional ability to build things that last.",
+        "isolation": "Physical and routine tasks may feel draining. Structured routines, delegation, and working in short focused sessions will be very helpful."
+    },
+    {
+        "name": "Arrow of Determination",
+        "numbers": [9, 5, 1],
+        "strength": "Exceptionally strong-willed and focused. An outstanding planner with the drive to see things through. You are a natural achiever in everything you commit to.",
+        "isolation": "Planning and staying on course can be difficult. Seek mentors, use accountability partners, and break large goals into small daily actions."
+    },
+    {
+        "name": "Arrow of Compassion",
+        "numbers": [2, 7, 6],
+        "strength": "Deep empathy and emotional intelligence. A natural healer and counselor, profoundly attuned to the needs of others. People feel safe in your presence.",
+        "isolation": "Emotional connection with others may need conscious development. Practising active listening and empathy exercises will open new depths of relationship."
+    },
+    {
+        "name": "Arrow of the Planner",
+        "numbers": [4, 5, 6],
+        "strength": "An excellent long-term planner and organizer. You create systems and structures that stand the test of time. Your methodical approach ensures lasting achievement.",
+        "isolation": "Long-term planning may feel elusive. Focus on small, daily actions that accumulate toward larger goals, and review progress weekly."
+    },
+    {
+        "name": "Arrow of Resilience",
+        "numbers": [2, 5, 8],
+        "strength": "Remarkable inner strength to recover from any setback. You learn from hardship and emerge stronger. Financially and emotionally, you are built to endure.",
+        "isolation": "Setbacks may feel overwhelming. Building a spiritual practice, a strong support network, and celebrating small wins will build your inner resilience."
+    },
+]
+
+# ── Lo Shu Planes ─────────────────────────────────────────────────────────────
+LOSHU_PLANES = [
+    {"name": "Thought Plane",   "numbers": [4, 9, 2], "description": "How you think, learn and process information"},
+    {"name": "Will Plane",      "numbers": [3, 5, 7], "description": "Your drive, determination and inner willpower"},
+    {"name": "Action Plane",    "numbers": [8, 1, 6], "description": "How you take action in the physical world"},
+    {"name": "Spiritual Plane", "numbers": [4, 3, 8], "description": "Your spiritual nature, memory and physical vitality"},
+    {"name": "Soul Plane",      "numbers": [9, 5, 1], "description": "Your emotional depth and intuitive nature"},
+    {"name": "Practical Plane", "numbers": [2, 7, 6], "description": "Your practical, material and creative abilities"},
+]
+
+# ── Lo Shu Special Combinations ───────────────────────────────────────────────
+LOSHU_SPECIAL_COMBOS = [
+    {
+        "condition": {3: 1, 1: 2},
+        "label": "Detail-Oriented & Critical",
+        "text": "Detail-oriented. Their habit of focusing on minute details tends to bring their attention to imperfections, making them find faults in others and correct them."
+    },
+    {
+        "condition": {9: 2, 3: 1},
+        "label": "Must Prove Themselves Right",
+        "text": "Must prove themselves right in every situation. This can lead to disagreements and arguments as they prioritise proving their point over reaching a harmonious conclusion."
+    },
+    {
+        "condition": {9: 2, 7: 1},
+        "label": "Logical & Spiritually Gifted",
+        "text": "Logical and gifted with a spiritual bent of mind. They believe whatever happens, happens for their highest good."
+    },
+    {
+        "condition": {7: 1, 1: 2},
+        "label": "Fascinated by Mystery",
+        "text": "Fascinated by mystery. The unknown captivates and intrigues them."
+    },
+    {
+        "condition": {5: 2, 7: 1},
+        "label": "Learns & Earns from Skills",
+        "text": "Encouraged to learn new skills. They have the ability to earn from the knowledge they acquire."
+    },
+    {
+        "condition": {4: 1, 2: 1, 5: 2, 8: 1},
+        "label": "Business Acumen & Property",
+        "text": "Great in business. They usually invest in and acquire a lot of property."
+    },
+    {
+        "condition": {2: 2, 7: 2, 1: 1},
+        "label": "Sentimental & Often Cheated",
+        "text": "Very sentimental and emotional. Unfortunately, they are often cheated during their life."
+    },
+    {
+        "condition": {4: 2, 8: 2},
+        "label": "Mind Power, Hard to Monetize",
+        "text": "Blessed with good mind power, however, they will find themselves not able to monetize it, which leads to further struggle."
+    },
+    {
+        "condition": {9: 1, 2: 3},
+        "label": "Easily Influenced",
+        "text": "Easily influenced by others and often seen to lose focus and fall into the trap of distraction."
+    },
+    {
+        "condition": {9: 1, 5: 2, 1: 2, 6: 1},
+        "label": "Rich Lifestyle, Materialistic",
+        "text": "Lead a rich lifestyle and thus become attracted to materialistic things."
+    },
+]
+
 LOSHU_INTERPRETATIONS = {
     1: {1: "Self-confident, expressive and vocal. Good communication skills. Natural ability to connect with others.", 2: "Strong communicator but may sometimes overexplain. Good at influencing others through words.", 3: "Difficulty vocalizing thoughts despite strong opinions. May attract conflicts through speech. Tendency to overexplain. Hard to say no. Can become dependent on others."},
     2: {1: "Balanced intuition and emotional sensitivity. Good family values and relationships.", 2: "Very family-oriented - family is everything. Highly intuitive with almost always correct instincts. Sensitive and emotionally driven.", 3: "Extremely sensitive and emotional. May be overly dependent on family. Strong psychic abilities but can be overwhelmed by emotions."},
@@ -358,6 +573,231 @@ CAREER_DATA = {
     (9,9): {"general": "Double Mars energy — extraordinary passion, courage and humanitarian drive.", "fields": "Humanitarian Leadership, Military Service, Sports, Activism, Social Reform", "strengths": "exceptional courage, passionate service, powerful transformation", "challenges": "channeling aggression, practical sustainability"},
 }
 
+# ── Pinnacle Data ─────────────────────────────────────────────────────────────
+PINNACLE_DATA = {
+    1: {
+        "title": "Pinnacle of Leadership & Independence",
+        "text": "A period of self-discovery and personal development. You are called to step forward as an individual — to lead, initiate, and forge your own path. Confidence, originality, and self-reliance are the keys to success. Opportunities come through bold action and independent thinking. Seeds of ambition planted now will bear fruit in future cycles.",
+        "themes": "Independence, Leadership, New Beginnings, Self-Reliance",
+        "advice": "Trust your instincts. Don't wait for others' approval. Take the lead and initiate the changes you wish to see in your life."
+    },
+    2: {
+        "title": "Pinnacle of Cooperation & Partnership",
+        "text": "A quieter, more reflective period focused on relationships, cooperation, and emotional depth. Progress comes through patience and working harmoniously with others. Intuition is heightened, and meaningful partnerships — personal and professional — are your greatest source of support and growth. Small, steady steps accumulate into significant progress.",
+        "themes": "Patience, Diplomacy, Partnerships, Emotional Growth",
+        "advice": "Be patient and adaptable. Success comes through collaboration. Trust your intuition and nurture the relationships that matter most."
+    },
+    3: {
+        "title": "Pinnacle of Creativity & Expression",
+        "text": "A vibrant, socially rich period that brings opportunities for creative expression, communication, and joyful expansion. This is a time to shine — to share your talents, build your network, and express yourself fully. The arts, writing, speaking, and social activities are especially favoured. Optimism and a light-hearted approach attract remarkable opportunities.",
+        "themes": "Creativity, Communication, Social Growth, Joy",
+        "advice": "Express yourself freely and fully. Share your gifts with the world. Cultivate joy and let your personality attract the connections and opportunities you need."
+    },
+    4: {
+        "title": "Pinnacle of Foundation & Hard Work",
+        "text": "A period of building — laying the foundations of security, stability, and long-term success through sustained effort and discipline. The work done now creates structures that support you for decades. It may feel demanding at times, but every effort made is an investment in lasting achievement. Health, home, finances, and career all benefit from careful attention.",
+        "themes": "Discipline, Hard Work, Stability, Foundation-Building",
+        "advice": "Embrace routine, structure, and sustained effort. Focus on quality over shortcuts. The foundation you build now will support all future success."
+    },
+    5: {
+        "title": "Pinnacle of Change & Freedom",
+        "text": "A dynamic and unpredictable period that brings significant changes, new adventures, and an expanded sense of freedom. Flexibility, adaptability, and openness to new experiences are essential. Travel, new careers, new relationships, and exciting opportunities arise when you release attachment to the familiar and embrace the momentum of change.",
+        "themes": "Change, Freedom, Adventure, Versatility",
+        "advice": "Embrace change rather than resisting it. Stay flexible and open. The opportunities in this period come disguised as disruption — welcome them."
+    },
+    6: {
+        "title": "Pinnacle of Family & Responsibility",
+        "text": "A period centred on home, family, love, and community responsibility. You are called to nurture, support, and create harmony in your closest relationships. Meaningful domestic achievements — marriage, home, raising children, community service — bring profound fulfilment. Beauty, creativity, and a caring nature attract love and appreciation in all forms.",
+        "themes": "Family, Love, Responsibility, Service, Harmony",
+        "advice": "Embrace your responsibilities with love. Invest in your home and relationships. Your greatest fulfilment comes through serving those you love with an open heart."
+    },
+    7: {
+        "title": "Pinnacle of Reflection & Inner Wisdom",
+        "text": "A deeply introspective period that calls you inward. A time for study, spiritual development, deep thinking, and the cultivation of inner wisdom. Material ambitions take a back seat as the focus shifts to understanding — of yourself, of life, of the deeper patterns at work. Solitude, research, and contemplative practices are especially rewarding.",
+        "themes": "Spirituality, Reflection, Wisdom, Study, Inner Growth",
+        "advice": "Value quiet and solitude. Invest in knowledge, meditation, and inner development. Wisdom earned in this period becomes an enduring inner resource."
+    },
+    8: {
+        "title": "Pinnacle of Achievement & Material Power",
+        "text": "A powerful period of material achievement, career advancement, and financial growth. The ambitions and hard work of previous cycles now produce tangible rewards. Authority, recognition, and material success are hallmarks of this pinnacle. Business ventures, investments, and leadership roles are especially favoured. Apply yourself with discipline and integrity.",
+        "themes": "Achievement, Career, Financial Growth, Authority, Recognition",
+        "advice": "Think big and act decisively. Apply discipline and integrity to your ambitions. The rewards of this pinnacle are proportional to the effort and character you bring."
+    },
+    9: {
+        "title": "Pinnacle of Completion & Humanitarian Service",
+        "text": "A profoundly meaningful period of completion, wisdom, and service to others. You are called to release what no longer serves, to forgive, and to contribute to something larger than yourself. Compassion, tolerance, and a universal perspective define this time. Fulfilment comes not from personal gain but from the depth of your contribution to others.",
+        "themes": "Completion, Compassion, Service, Wisdom, Universal Love",
+        "advice": "Let go with grace. Give generously without expectation. Your purpose in this period is to be of service — and in that service, you will find profound fulfilment."
+    },
+}
+
+# ── Challenge Data ─────────────────────────────────────────────────────────────
+CHALLENGE_DATA = {
+    0: {
+        "title": "Challenge of All Choices",
+        "text": "The 0 Challenge is rare and represents the challenge of choice itself. All doors are open, but the absence of a defining weakness means you must develop the wisdom to choose rightly. This can lead to indecision or a feeling of being lost. The path is to develop strong personal values and the courage to commit to them fully.",
+        "lesson": "Develop clarity of values and the courage to commit to a chosen path despite having infinite options."
+    },
+    1: {
+        "title": "Challenge of Self",
+        "text": "The core challenge is to develop authentic confidence, independence, and assertiveness. You may struggle with over-dependence on others' opinions or — conversely — with aggressive overcompensation. The lesson is to find the middle path: genuine self-reliance that neither isolates nor dominates.",
+        "lesson": "Develop genuine self-confidence. Learn to lead without aggression and to stand alone without isolation."
+    },
+    2: {
+        "title": "Challenge of Sensitivity",
+        "text": "You are naturally empathetic and sensitive, but the challenge lies in managing that sensitivity productively. Hypersensitivity, indecision, fear of confrontation, and difficulty setting emotional boundaries are the main obstacles. Honour your sensitivity as a gift while developing emotional resilience and the courage to be direct.",
+        "lesson": "Honor your sensitivity while building emotional resilience. Learn to set boundaries and speak your truth with kindness."
+    },
+    3: {
+        "title": "Challenge of Expression",
+        "text": "The challenge of sharing your creativity, ideas, and personality fully and confidently. Self-doubt, self-criticism, and scattered energy can prevent you from fulfilling your creative potential. The lesson is to commit to a creative outlet, silence the inner critic, and share your gifts without waiting for perfection.",
+        "lesson": "Silence self-doubt and express yourself freely. Choose one creative path and commit to it deeply."
+    },
+    4: {
+        "title": "Challenge of Discipline",
+        "text": "The challenge is to develop structure, patience, and consistent effort without becoming rigid or resistant to change. You may swing between overwork and inactivity, or struggle with practicality and routine. Build reliable habits that support long-term success without suffocating your natural spontaneity.",
+        "lesson": "Build daily structure and discipline. Learn to work consistently without becoming rigid or resentful of routine."
+    },
+    5: {
+        "title": "Challenge of Freedom",
+        "text": "The challenge is to find healthy freedom without becoming irresponsible. Restlessness, overindulgence, and fear of commitment are the shadow sides of this number. The desire for constant change can undermine relationships, careers, and finances. The lesson is to embrace freedom within structure — adventurous but grounded.",
+        "lesson": "Channel your love of freedom productively. Develop commitment and follow-through without sacrificing your adventurous spirit."
+    },
+    6: {
+        "title": "Challenge of Responsibility",
+        "text": "The challenge is a balanced relationship with responsibility — caring for others without martyrdom, and having high standards without perfectionism. You may take on too much and resent it, or struggle to accept help. Give generously from a full cup rather than an empty one.",
+        "lesson": "Balance caring for others with caring for yourself. Release perfectionism and the need to control outcomes for those you love."
+    },
+    7: {
+        "title": "Challenge of Trust",
+        "text": "The challenge is to develop faith — in yourself, in others, and in life itself. Excessive skepticism, emotional withdrawal, and a tendency to isolate can prevent deep connection. The fear of being misunderstood or betrayed may keep you at a safe but lonely distance. Your depth is a gift — trust others enough to share it.",
+        "lesson": "Develop faith and openness. Allow others to truly know you. Trust is the gateway to the depth of connection you seek."
+    },
+    8: {
+        "title": "Challenge of Power",
+        "text": "The challenge is to develop a healthy, balanced relationship with material power — money, authority, and ambition. Either the pursuit of power or the fear of it can create significant obstacles. Misuse of authority, materialism, or conversely sabotaging your own financial success, are common expressions. Use power ethically and with genuine generosity.",
+        "lesson": "Develop a healthy relationship with money and authority. Use power in service of others and build success on a foundation of integrity."
+    },
+}
+
+# ── Compatibility Data ─────────────────────────────────────────────────────────
+
+COMPAT_MATRIX = {
+    (1,1): 9, (1,2): 7, (1,3): 9, (1,4): 5, (1,5): 8, (1,6): 7, (1,7): 7, (1,8): 3, (1,9): 9,
+    (2,2): 8, (2,3): 8, (2,4): 5, (2,5): 8, (2,6): 9, (2,7): 8, (2,8): 3, (2,9): 6,
+    (3,3): 9, (3,4): 5, (3,5): 9, (3,6): 8, (3,7): 9, (3,8): 4, (3,9): 8,
+    (4,4): 6, (4,5): 7, (4,6): 6, (4,7): 8, (4,8): 9, (4,9): 4,
+    (5,5): 9, (5,6): 8, (5,7): 7, (5,8): 6, (5,9): 7,
+    (6,6): 9, (6,7): 8, (6,8): 4, (6,9): 8,
+    (7,7): 8, (7,8): 5, (7,9): 6,
+    (8,8): 8, (8,9): 3,
+    (9,9): 8,
+}
+
+COMPAT_PAIR_TEXT = {
+    (1,1): "Two strong-willed leaders who understand each other's drive and ambition deeply. The key is avoiding power struggles — when you align your goals rather than compete, this pairing becomes unstoppable. Equal respect is everything.",
+    (1,2): "The leader and the peacemaker complement each other beautifully. 1 provides direction and drive while 2 provides emotional depth and support. Some tension exists between independence and need for closeness, but this is a deeply rewarding balance.",
+    (1,3): "Sun and Jupiter are cosmic friends, and it shows. Natural warmth, shared enthusiasm, and a mutual love of life make this a joyful and expansive pairing. You inspire each other to grow, lead, and create.",
+    (1,4): "The pioneer meets the builder. 1 moves fast; 4 moves methodically. With respect for each other's pace, this pair can construct something truly remarkable and lasting together.",
+    (1,5): "Both love freedom and action. 1 leads from ambition and 5 leads from curiosity — together you create an energetic, stimulating relationship full of adventure and fresh experiences.",
+    (1,6): "Leadership meets love and nurturing. 1 drives ambition forward while 6 creates warmth at home. Deeply fulfilling when 1 slows down enough to appreciate what 6 builds, and 6 allows 1 their independence.",
+    (1,7): "The doer and the thinker. 1 acts while 7 reflects. This creates a stimulating balance — 7's depth fascinates 1, and 7 is grounded by 1's decisiveness. Mutual respect for different approaches is key.",
+    (1,8): "Sun and Saturn — a classic challenge. Both are powerful but operate at opposite frequencies. 1 seeks recognition; 8 seeks control. A deep karmic pairing that requires extraordinary mutual respect to thrive.",
+    (1,9): "Two fire energies united. Sun and Mars create a passionate, courageous, and driven pairing. You share ambition, idealism, and the desire to make your mark on the world. Intensely compatible.",
+    (2,2): "Double sensitivity creates profound emotional understanding — you intuitively sense each other's needs. The risk is over-sensitivity and co-dependence. Maintaining individual strength keeps this deep connection healthy.",
+    (2,3): "Moon and Jupiter — a harmonious and nourishing pairing. 2 provides emotional warmth and 3 provides optimism and expansive energy. You naturally uplift each other and build a joyful shared life.",
+    (2,4): "Emotion meets practicality. 2 seeks connection and 4 seeks security through work. When 4 expresses feelings and 2 appreciates 4's steady dedication, this becomes a deeply stable and trusting relationship.",
+    (2,5): "Intuition meets versatility. 2's emotional depth complements 5's dynamic energy. 5 brings excitement into 2's world; 2 provides the emotional anchor that free-spirited 5 secretly needs.",
+    (2,6): "One of the most naturally harmonious pairings. Moon and Venus are cosmic friends — both value love, family, and emotional depth. A deeply warm, nurturing, and mutually supportive relationship.",
+    (2,7): "Deep emotional and spiritual resonance. Both 2 and 7 are intuitive, sensitive, and drawn to the unseen. This pairing creates a mystical, soulful connection built on unspoken understanding.",
+    (2,8): "Sensitivity meets ambition. 2 needs emotional warmth; 8 leads with power. Saturn can feel cold to the Moon's needs. Deep growth is possible here, but requires significant patience and effort from both.",
+    (2,9): "Empathy meets passion. 2's nurturing nature and 9's humanitarian fire create a loving and purposeful bond. The challenge is that 9 can be too intense and independent for 2's need for closeness.",
+    (3,3): "Double Jupiter — an abundant, joyful, and creatively explosive pairing. You bring out each other's wit, enthusiasm, and social brilliance. The risk is over-indulgence and scattered energy, but this is a deeply happy union.",
+    (3,4): "Creativity meets discipline. 3's expansive ideas and 4's practical execution can be a powerful team. Tension arises when 3 feels constrained and 4 feels overwhelmed by 3's pace — but together you're formidable.",
+    (3,5): "Two of the most communicative numbers. Jupiter and Mercury are natural cosmic friends. You stimulate each other intellectually, love new experiences, and create a vibrant, joyful shared life.",
+    (3,6): "Creative beauty. 3 expresses and 6 nurtures. Together you create an aesthetically rich, socially warm relationship. Both are loving and generous — a highly compatible and joyful pairing.",
+    (3,7): "Wisdom and expression. 3 communicates outwardly; 7 contemplates deeply. When balanced, 3 gives 7 a reason to emerge, and 7 gives 3's ideas profound depth. A deeply enriching connection.",
+    (3,8): "Jupiter and Saturn are natural opposites — expansion meets contraction. 3's optimism and 8's pragmatism can clash, but when harnessed together they create a remarkably balanced and successful partnership.",
+    (3,9): "Two generous, expansive souls united by shared fire and enthusiasm. You inspire each other and share a love of life. Creative, passionate, and mutually supportive — a highly compatible pairing.",
+    (4,4): "Double Rahu — unconventional and unpredictable. You understand each other's restless nature and non-conformist thinking. The challenge is grounding — two Rahu energies can scatter without shared structure.",
+    (4,5): "The unconventional meets the versatile. Both 4 and 5 resist the ordinary. You understand each other's need for freedom from convention and can build an exciting, innovative life together.",
+    (4,6): "Structure meets nurturing. 4 builds the foundation; 6 creates the home. A practical and loving pairing that works best when both appreciate what the other brings rather than trying to change each other.",
+    (4,7): "Two introspective, analytical minds. Rahu and Ketu are complementary forces in Vedic astrology — shadow planets that balance each other. This creates a deep, unusual, and profoundly interesting connection.",
+    (4,8): "Two of the most materially ambitious numbers. When aligned, Rahu and Saturn create extraordinary financial and business success. This is one of the most powerful pairings for shared practical ambition.",
+    (4,9): "Rahu meets Mars — unconventional meets passionate. This pairing can produce remarkable innovation or significant conflict, depending on both individuals' maturity and willingness to meet each other halfway.",
+    (5,5): "Double Mercury — the most versatile and communicative of all pairings. Two 5s create an endlessly stimulating, free, and adventurous relationship. You must consciously build roots together to sustain it.",
+    (5,6): "Freedom meets responsibility. 5 needs change and exploration; 6 needs stability and family. With mutual respect, 5 brings excitement and 6 brings warmth — a beautifully complementary pairing.",
+    (5,7): "Curiosity meets wisdom. 5's love of new experiences combines with 7's depth of knowledge. Both are drawn to understanding — 5 explores the outer world while 7 explores the inner. A stimulating and enriching bond.",
+    (5,8): "Adaptability meets authority. 5 moves freely while 8 seeks control. With mutual respect, this pairing can build an exciting and financially successful life. The key is honouring each other's very different rhythms.",
+    (5,9): "Two dynamic energies. Mercury and Mars create a stimulating, action-filled relationship. Both love freedom and excitement — a passionate and spirited pairing that thrives on growth and new adventures.",
+    (6,6): "Pure Venus energy — the most loving and harmonious self-pairing. You both value beauty, family, and emotional depth equally. Deep understanding, mutual devotion, and a naturally beautiful shared life.",
+    (6,7): "Love meets wisdom. Venus and Ketu create a beautifully balanced pairing — 6 brings warmth and connection while 7 brings depth and spiritual understanding. A quietly profound and deeply fulfilling union.",
+    (6,8): "Nurturing meets ambition. 6's loving energy and 8's drive for success can be at odds. When 8 remembers to be present and 6 supports 8's ambition, this pairing achieves both love and material success.",
+    (6,9): "Love meets passion. Venus and Mars create natural attraction. 6 nurtures and 9 inspires — a warm, passionate, and socially conscious relationship. One of the most romantically compatible pairings.",
+    (7,7): "A rare and profound spiritual bond. You understand each other at the soul level without words. The risk is becoming too withdrawn together — outside connection and shared purpose help keep you balanced.",
+    (7,8): "Spiritual meets material. Ketu seeks liberation while Saturn seeks accumulation — fundamentally different orientations. This pairing requires extraordinary mutual understanding and respect for different life priorities.",
+    (7,9): "Spirituality meets passion. 7's reflective, inward energy is both attracted to and challenged by 9's outward-facing fire. An interesting and growth-producing pairing when both respect each other's nature.",
+    (8,8): "Double Saturn — formidable. Two 8s together create an extraordinarily powerful pairing for shared ambition and business. Romantically, both need to consciously create warmth and emotional connection.",
+    (8,9): "Saturn meets Mars — the most challenging pairing in numerology. Both are powerful and neither yields easily. Profound karmic lessons await here, but the friction rarely produces the harmony both truly desire.",
+    (9,9): "Double Mars energy — passionate, powerful, and intense. You share the same humanitarian fire and ambition to make a difference. The challenge is managing two equally strong-willed energies without competition.",
+}
+
+RELATIONSHIP_NUMBER_DATA = {
+    1: "Combined, you radiate independence and leadership. This relationship is defined by individual strength and shared ambition — at its best when both support each other's goals equally.",
+    2: "Your combined energy creates a deeply sensitive, intuitive, and cooperative bond. Harmony and mutual support are the hallmarks of your relationship.",
+    3: "Together you are a creatively explosive pair — joyful, communicative, and socially magnetic. Life is more vibrant and fun when you're together.",
+    4: "Your relationship creates a foundation of stability, hard work, and long-term security. You are building something real and lasting together.",
+    5: "Combined, you create a dynamic, freedom-loving, and adventurous union. Change and variety keep your relationship alive and exciting.",
+    6: "Your relationship vibrates with love, responsibility, and beauty. Family, home, and creating a harmonious life together are central themes.",
+    7: "Together you enter a realm of depth, mystery, and spiritual growth. This is a profoundly meaningful, soul-level connection.",
+    8: "Combined, your energy radiates material ambition and the desire for achievement. This is a powerhouse partnership built for success.",
+    9: "Your relationship carries a humanitarian, compassionate energy. Together you are drawn to serve, inspire, and make a meaningful difference in the world.",
+}
+
+GIFT_QUALITIES = {
+    1: "Confidence & self-expression",
+    2: "Intuition & emotional sensitivity",
+    3: "Creativity & imagination",
+    4: "Practicality & discipline",
+    5: "Adaptability & freedom",
+    6: "Love & responsibility",
+    7: "Spirituality & inner wisdom",
+    8: "Ambition & material strength",
+    9: "Compassion & humanitarianism",
+}
+
+PLANE_COMPAT_TEXT = {
+    ("Action Plane",   "Action Plane"):    "Double action energy — busy, productive and hands-on. Must ensure they make time to connect emotionally.",
+    ("Action Plane",   "Practical Plane"): "Two action-oriented people — highly productive and efficient together. Great for shared goals and projects.",
+    ("Action Plane",   "Soul Plane"):      "Action meets feeling — one brings momentum while the other brings warmth. A dynamic and caring relationship.",
+    ("Action Plane",   "Spiritual Plane"): "Doing meets being — the practical one helps manifest the spiritual one's visions into reality.",
+    ("Action Plane",   "Thought Plane"):   "Ideas meet action — one brings the vision while the other makes it real. A naturally productive combination.",
+    ("Action Plane",   "Will Plane"):      "Determination meets action — a driven, goal-oriented combination that rarely fails to achieve its ambitions.",
+    ("Practical Plane","Practical Plane"): "Both grounded and real-world focused — a stable, reliable, and materially secure relationship.",
+    ("Practical Plane","Soul Plane"):      "Emotion meets pragmatism — heart and hands work together in a mutually supportive bond.",
+    ("Practical Plane","Spiritual Plane"): "Vision meets groundedness — the spiritual one elevates while the practical one ensures stability.",
+    ("Practical Plane","Thought Plane"):   "Thinking meets doing — a balanced pair where ideas are always grounded in practicality.",
+    ("Practical Plane","Will Plane"):      "Drive meets practicality — a reliable, hard-working pair who gets things done without losing sight of real-world needs.",
+    ("Soul Plane",     "Soul Plane"):      "Two deeply feeling souls — an empathic, emotionally rich relationship that must guard against mutual over-sensitivity.",
+    ("Soul Plane",     "Spiritual Plane"): "Spirit meets soul — an intensely meaningful and karmic bond. You feel you have known each other before.",
+    ("Soul Plane",     "Thought Plane"):   "Logic meets emotion — one grounds the feelings of the other while gaining depth in return.",
+    ("Soul Plane",     "Will Plane"):      "Willpower meets emotional depth — one provides the drive, the other the heart. A deeply fulfilling bond.",
+    ("Spiritual Plane","Spiritual Plane"): "A deeply soulful connection — shared spiritual values, introspection, and a sense of higher purpose.",
+    ("Spiritual Plane","Thought Plane"):   "Intellect and spirit interweave — deep philosophical discussions and mutual growth characterize this bond.",
+    ("Spiritual Plane","Will Plane"):      "Inner drive meets inner wisdom — a transformative combination that can inspire and lead others.",
+    ("Thought Plane",  "Thought Plane"):   "Both lead with the mind — intellectual conversations, shared curiosity, and deep analysis define this relationship.",
+    ("Thought Plane",  "Will Plane"):      "Mind meets willpower — the thinker and the doer complement each other beautifully, balancing strategy with execution.",
+    ("Will Plane",     "Will Plane"):      "Two strong wills — powerful and unstoppable when aligned, but requires compromise to avoid power struggles.",
+}
+
+def get_compat_score(a, b):
+    return COMPAT_MATRIX.get((min(a, b), max(a, b)), 5)
+
+def _sk(n):
+    if n in (11, 22, 33):
+        return n % 9 or 9
+    return n
+
 # ── Helper ─────────────────────────────────────────────────────────────────────
 
 def build_report(name, dob_str):
@@ -424,6 +864,109 @@ def build_report(name, dob_str):
         "challenges": "balance between personal goals and service"
     })
 
+    # ── Pinnacles & Challenges ───────────────────────────────────────────────
+    today = date.today()
+    current_age = today.year - year - (1 if (today.month, today.day) < (month, day) else 0)
+
+    pinnacle_nums = get_pinnacles(day, month, year)
+    p1_end = 36 - bk  # bk is already the single-digit safe key of bhagyank
+    pinnacle_ranges = [
+        (0,       p1_end),
+        (p1_end,  p1_end + 9),
+        (p1_end + 9,  p1_end + 18),
+        (p1_end + 18, None),
+    ]
+    active_pin_idx = next(
+        (i for i, (s, e) in enumerate(pinnacle_ranges) if e is None or current_age < e),
+        3
+    )
+    pinnacle_list = []
+    for i, (num, (s, e)) in enumerate(zip(pinnacle_nums, pinnacle_ranges)):
+        pinnacle_list.append({
+            'number': i + 1,
+            'pinnacle': num,
+            'age_range': f"{s}–{e - 1}" if e else f"{s}+",
+            'is_active': i == active_pin_idx,
+            'data': PINNACLE_DATA[num],
+        })
+
+    challenge_nums = get_challenges(day, month, year)
+    challenge_labels = ['First Challenge', 'Second Challenge', 'Main Challenge', 'Fourth Challenge']
+    challenge_list = []
+    for i, num in enumerate(challenge_nums):
+        is_main = (i == 2)
+        is_period = (i == active_pin_idx) or (i == 3 and active_pin_idx >= 2)
+        challenge_list.append({
+            'number': i + 1,
+            'challenge': num,
+            'label': challenge_labels[i],
+            'is_main': is_main,
+            'is_active': is_main or is_period,
+            'data': CHALLENGE_DATA[num],
+        })
+
+    # ── Personal Month & Day ─────────────────────────────────────────────────
+    personal_month = get_personal_month(py, today.month)
+    personal_day = get_personal_day(personal_month, today.day)
+
+    days_in_month = calendar.monthrange(today.year, today.month)[1]
+    daily_forecast = [
+        {
+            'day': d,
+            'personal_day': get_personal_day(personal_month, d),
+            'pd_data': PERSONAL_DAY_DATA[get_personal_day(personal_month, d)],
+        }
+        for d in range(1, days_in_month + 1)
+    ]
+
+    MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June',
+                   'July', 'August', 'September', 'October', 'November', 'December']
+    monthly_forecast = [
+        {
+            'month_num': m,
+            'month_name': MONTH_NAMES[m - 1],
+            'personal_month': get_personal_month(py, m),
+            'pm_data': PERSONAL_MONTH_DATA[get_personal_month(py, m)],
+        }
+        for m in range(1, 13)
+    ]
+
+    # ── Lo Shu Arrows ────────────────────────────────────────────────────────
+    strength_arrows = []
+    isolation_arrows = []
+    for arrow in LOSHU_ARROWS:
+        nums = arrow['numbers']
+        all_present = all(grid[n] > 0 for n in nums)
+        all_absent = all(grid[n] == 0 for n in nums)
+        if all_present:
+            strength_arrows.append({'name': arrow['name'], 'numbers': nums, 'text': arrow['strength']})
+        elif all_absent:
+            isolation_arrows.append({'name': arrow['name'], 'numbers': nums, 'text': arrow['isolation']})
+
+    # ── Lo Shu Planes ────────────────────────────────────────────────────────
+    planes_analysis = []
+    for plane in LOSHU_PLANES:
+        nums = plane['numbers']
+        present = [n for n in nums if grid[n] > 0]
+        absent = [n for n in nums if grid[n] == 0]
+        count = len(present)
+        planes_analysis.append({
+            'name': plane['name'],
+            'numbers': nums,
+            'present': present,
+            'absent': absent,
+            'count': count,
+            'status': 'strong' if count == 3 else 'partial' if count > 0 else 'absent',
+            'description': plane['description'],
+        })
+
+    # ── Lo Shu Special Combos ────────────────────────────────────────────────
+    detected_combos = [
+        {'label': combo['label'], 'text': combo['text']}
+        for combo in LOSHU_SPECIAL_COMBOS
+        if all(grid.get(n, 0) >= cnt for n, cnt in combo['condition'].items())
+    ]
+
     report = {
         **data,
         'mulank_data': MULANK_DATA[mk],
@@ -440,6 +983,22 @@ def build_report(name, dob_str):
         'career': career,
         'loshu_interps': loshu_interps,
         'missing_data': {n: MISSING_NUMBER_DATA[n] for n in missing if n in MISSING_NUMBER_DATA},
+        'personal_month': personal_month,
+        'personal_month_data': PERSONAL_MONTH_DATA[personal_month],
+        'personal_day': personal_day,
+        'personal_day_data': PERSONAL_DAY_DATA[personal_day],
+        'monthly_forecast': monthly_forecast,
+        'today_str': today.strftime('%d %B %Y'),
+        'current_month': today.month,
+        'today_day': today.day,
+        'daily_forecast': daily_forecast,
+        'strength_arrows': strength_arrows,
+        'isolation_arrows': isolation_arrows,
+        'planes_analysis': planes_analysis,
+        'detected_combos': detected_combos,
+        'current_age': current_age,
+        'pinnacle_list': pinnacle_list,
+        'challenge_list': challenge_list,
     }
     return report
 
@@ -557,8 +1116,11 @@ def generate_pdf():
                     story.append(Paragraph(str(p), body_style))
 
         # 1. Mulank
-        mk = report['mulank']
-        bk = report['bhagyank']
+        def _sk_pdf(n):
+            if n in (11, 22, 33): return n % 9 or 9
+            return n
+        mk = _sk_pdf(report['mulank'])
+        bk = _sk_pdf(report['bhagyank'])
         def format_mulank_para(p):
             for label in ['Favourable Period:', 'Unfavourable Period:', 'Lucky Colours:']:
                 if p.startswith(label):
@@ -622,9 +1184,59 @@ def generate_pdf():
             f"<font size=\"11\"><b>Your Luck This Year: {report['personal_year_luck']}%</b></font>",
         ])
 
-        # 11. Career
+        # 11. Personal Month
+        pmd = report['personal_month_data']
+        section(f"11. Personal Month {report['personal_month']} — {report['today_str']}", [
+            f"<font size=\"11\"><b>Positive Traits This Month</b></font>",
+            pmd['positive'],
+            f"<font size=\"11\"><b>Watch Out For</b></font>",
+            pmd['negative'],
+            f"<font size=\"11\"><b>Tips for This Month</b></font>",
+            pmd['tips'],
+        ])
+
+        # Monthly Forecast table
+        forecast = report['monthly_forecast']
+        cur_month = report['current_month']
+        MONTH_ABBR = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+        fc_data = [['Month', 'PM'], ['Month', 'PM'], ['Month', 'PM'], ['Month', 'PM']]
+        fc_rows = [fc['month_name'][:3] + ' — PM ' + str(fc['personal_month']) for fc in forecast]
+        fc_table_data = [fc_rows[i:i+2] for i in range(0, 12, 2)]
+        ft = Table(fc_table_data, colWidths=[75 * mm, 75 * mm])
+        ft.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, -1), cream),
+            ('TEXTCOLOR', (0, 0), (-1, -1), dark_brown),
+            ('FONTSIZE', (0, 0), (-1, -1), 9),
+            ('GRID', (0, 0), (-1, -1), 0.5, gold),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('ROWBACKGROUNDS', (0, 0), (-1, -1), [cream, colors.HexColor('#FFF0D8')]),
+            ('TOPPADDING', (0, 0), (-1, -1), 4),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
+        ]))
+        for row_i, fc_row in enumerate(fc_table_data):
+            for col_i, cell_text in enumerate(fc_row):
+                month_idx = row_i * 2 + col_i
+                if forecast[month_idx]['month_num'] == cur_month:
+                    ft.setStyle(TableStyle([
+                        ('BACKGROUND', (col_i, row_i), (col_i, row_i), gold),
+                        ('FONTNAME', (col_i, row_i), (col_i, row_i), 'Helvetica-Bold'),
+                    ]))
+        story.append(ft)
+        story.append(Spacer(1, 4 * mm))
+
+        # 12. Personal Day
+        pdd = report['personal_day_data']
+        section(f"12. Personal Day {report['personal_day']} — {report['today_str']}", [
+            pdd['text'],
+            f"<font size=\"11\"><b>Social Style</b></font>",
+            pdd['social_hints'],
+            f"<font size=\"11\"><b>Lucky Colours Today</b></font>",
+            pdd['lucky_colors'],
+        ])
+
+        # 13. Career
         car = report['career']
-        section(f"11. Career Numerology (Mulank {report['mulank']} + Bhagyank {report['bhagyank']})", [
+        section(f"13. Career Numerology (Mulank {report['mulank']} + Bhagyank {report['bhagyank']})", [
             car['general'],
             f"<font size=\"11\"><b>Recommended Career Fields</b></font>",
             car['fields'],
@@ -634,9 +1246,9 @@ def generate_pdf():
             car['challenges'],
         ])
 
-        # 12. Lo Shu Grid
+        # 14. Lo Shu Grid
         story.append(HRFlowable(width="100%", thickness=1, color=gold))
-        story.append(Paragraph("12. Lo Shu Grid", h1_style))
+        story.append(Paragraph("14. Lo Shu Grid", h1_style))
 
         grid = report['grid']
         loshu_rows = [[4, 9, 2], [3, 5, 7], [8, 1, 6]]
@@ -681,9 +1293,43 @@ def generate_pdf():
         for digit, interp in sorted(report['loshu_interps'].items()):
             story.append(Paragraph(f"<b>Number {digit}:</b> {interp}", body_style))
 
-        # 13. Missing Numbers
+        # Planes
+        story.append(Spacer(1, 3 * mm))
+        story.append(Paragraph("<b>Planes Analysis</b>", h2_style))
+        for plane in report['planes_analysis']:
+            status_label = {'strong': 'Complete', 'partial': 'Partial', 'absent': 'Absent'}.get(plane['status'], '')
+            nums_str = ', '.join(str(n) for n in plane['numbers'])
+            story.append(Paragraph(
+                f"<b>{plane['name']}</b> ({nums_str}) — <i>{status_label}</i>: {plane['description']}",
+                body_style
+            ))
+
+        # Arrows of Strength
+        if report['strength_arrows']:
+            story.append(Spacer(1, 3 * mm))
+            story.append(Paragraph("<b>Arrows of Strength</b>", h2_style))
+            for arrow in report['strength_arrows']:
+                nums_str = '-'.join(str(n) for n in arrow['numbers'])
+                story.append(Paragraph(f"<b>{arrow['name']}</b> ({nums_str}): {arrow['text']}", body_style))
+
+        # Arrows of Isolation
+        if report['isolation_arrows']:
+            story.append(Spacer(1, 3 * mm))
+            story.append(Paragraph("<b>Arrows of Isolation</b>", h2_style))
+            for arrow in report['isolation_arrows']:
+                nums_str = '-'.join(str(n) for n in arrow['numbers'])
+                story.append(Paragraph(f"<b>{arrow['name']}</b> ({nums_str}): {arrow['text']}", body_style))
+
+        # Special Combinations
+        if report['detected_combos']:
+            story.append(Spacer(1, 3 * mm))
+            story.append(Paragraph("<b>Special Combinations in Your Grid</b>", h2_style))
+            for combo in report['detected_combos']:
+                story.append(Paragraph(f"<b>{combo['label']}:</b> {combo['text']}", body_style))
+
+        # 15. Missing Numbers
         story.append(HRFlowable(width="100%", thickness=1, color=gold))
-        story.append(Paragraph("13. Missing Numbers — Impact & Remedy", h1_style))
+        story.append(Paragraph("15. Missing Numbers — Impact & Remedy", h1_style))
 
         if report['missing']:
             for num in report['missing']:
@@ -740,6 +1386,178 @@ def generate_pdf():
         response.headers['Content-Disposition'] = f'attachment; filename="{name} - Numerology Report.pdf"'
         return response
 
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/check-compatibility', methods=['POST'])
+def check_compatibility():
+    body = request.get_json()
+    name1 = body.get('name1', '').strip()
+    dob1  = body.get('dob1', '').strip()
+    name2 = body.get('name2', '').strip()
+    dob2  = body.get('dob2', '').strip()
+
+    if not all([name1, dob1, name2, dob2]):
+        return jsonify({'error': 'All four fields are required.'}), 400
+
+    def parse_dob(s):
+        parts = s.split('-')
+        if len(parts[0]) == 4:
+            yr, mo, dy = int(parts[0]), int(parts[1]), int(parts[2])
+        else:
+            dy, mo, yr = int(parts[0]), int(parts[1]), int(parts[2])
+        return dy, mo, yr
+
+    try:
+        d1, m1, y1 = parse_dob(dob1)
+        d2, m2, y2 = parse_dob(dob2)
+    except Exception:
+        return jsonify({'error': 'Invalid date format.'}), 400
+
+    try:
+        from numerology import reduce_number as _rn
+        r1 = calculate_all(name1, d1, m1, y1)
+        r2 = calculate_all(name2, d2, m2, y2)
+
+        mk1, mk2 = _sk(r1['mulank']),    _sk(r2['mulank'])
+        bk1, bk2 = _sk(r1['bhagyank']),  _sk(r2['bhagyank'])
+        nn1, nn2 = _sk(r1['name_number']), _sk(r2['name_number'])
+
+        ms = get_compat_score(mk1, mk2)
+        bs = get_compat_score(bk1, bk2)
+        ns = get_compat_score(nn1, nn2)
+
+        overall_9 = ms * 0.40 + bs * 0.35 + ns * 0.25
+        overall_pct = round(overall_9 / 9 * 100)
+
+        rel_num = _rn(mk1 + mk2, keep_master=False)
+
+        planet_names = {1:'Sun',2:'Moon',3:'Jupiter',4:'Rahu',5:'Mercury',
+                        6:'Venus',7:'Ketu',8:'Saturn',9:'Mars'}
+
+        # ── Lo Shu Grid Compatibility ──────────────────────────────────────────
+        grid1 = r1['grid']   # {1-9: count}, integer keys
+        grid2 = r2['grid']
+        combined = {n: grid1[n] + grid2[n] for n in range(1, 10)}
+
+        gifts_1_to_2  = [n for n in range(1, 10) if grid1[n] > 0 and grid2[n] == 0]
+        gifts_2_to_1  = [n for n in range(1, 10) if grid2[n] > 0 and grid1[n] == 0]
+        shared_present = [n for n in range(1, 10) if grid1[n] > 0 and grid2[n] > 0]
+        shared_missing  = [n for n in range(1, 10) if grid1[n] == 0 and grid2[n] == 0]
+
+        p2_missing = [n for n in range(1, 10) if grid2[n] == 0]
+        p1_missing = [n for n in range(1, 10) if grid1[n] == 0]
+        comp_p1_pct = round(len(gifts_1_to_2) / max(len(p2_missing), 1) * 100) if p2_missing else 100
+        comp_p2_pct = round(len(gifts_2_to_1) / max(len(p1_missing), 1) * 100) if p1_missing else 100
+        overall_comp_pct = round((comp_p1_pct + comp_p2_pct) / 2)
+
+        def get_dp(grid):
+            best = None; best_count = -1
+            for plane in LOSHU_PLANES:
+                c = sum(1 for n in plane['numbers'] if grid[n] > 0)
+                if c > best_count: best_count = c; best = plane['name']
+            return best
+
+        dp1_name = get_dp(grid1)
+        dp2_name = get_dp(grid2)
+        p_key = tuple(sorted([dp1_name, dp2_name]))
+        plane_compat_text = PLANE_COMPAT_TEXT.get(
+            p_key, "A unique energy combination with its own special dynamic."
+        )
+
+        overloaded = [n for n in range(1, 10) if combined[n] >= 3]
+        combined_unique = sum(1 for n in range(1, 10) if combined[n] > 0)
+
+        def arr_present(nums, g): return all(g[n] > 0 for n in nums)
+        arr_new, arr_sustained, arr_absent = [], [], []
+        for arr in LOSHU_ARROWS:
+            has1 = arr_present(arr['numbers'], grid1)
+            has2 = arr_present(arr['numbers'], grid2)
+            hasc = arr_present(arr['numbers'], combined)
+            if hasc:
+                (arr_new if not has1 and not has2 else arr_sustained).append(arr['name'])
+            else:
+                arr_absent.append(arr['name'])
+
+        sr = {'absent': 0, 'partial': 1, 'complete': 2}
+        def ps(nums, g):
+            c = sum(1 for n in nums if g[n] > 0)
+            return 'absent' if c == 0 else ('complete' if c == len(nums) else 'partial')
+
+        planes_compat = []
+        for plane in LOSHU_PLANES:
+            s1 = ps(plane['numbers'], grid1)
+            s2 = ps(plane['numbers'], grid2)
+            sc = ps(plane['numbers'], combined)
+            bi = max(s1, s2, key=lambda s: sr[s])
+            planes_compat.append({
+                'name': plane['name'],
+                'state_p1': s1, 'state_p2': s2, 'state_combined': sc,
+                'upgraded': sr[sc] > sr[bi],
+            })
+
+        key_nums = {
+            str(n): {'planet': pl, 'theme': th,
+                     'p1': grid1[n], 'p2': grid2[n], 'combined': combined[n]}
+            for n, pl, th in [
+                (2, 'Moon', 'Emotional Bond'),
+                (6, 'Venus', 'Love & Harmony'),
+                (9, 'Mars', 'Passion'),
+            ]
+        }
+
+        return jsonify({
+            'person1': {
+                'name': name1, 'dob': r1['dob'],
+                'mulank': r1['mulank'], 'mulank_key': mk1, 'mulank_planet': planet_names[mk1],
+                'bhagyank': r1['bhagyank'], 'bhagyank_key': bk1, 'bhagyank_planet': planet_names[bk1],
+                'name_number': r1['name_number'], 'nn_key': nn1,
+            },
+            'person2': {
+                'name': name2, 'dob': r2['dob'],
+                'mulank': r2['mulank'], 'mulank_key': mk2, 'mulank_planet': planet_names[mk2],
+                'bhagyank': r2['bhagyank'], 'bhagyank_key': bk2, 'bhagyank_planet': planet_names[bk2],
+                'name_number': r2['name_number'], 'nn_key': nn2,
+            },
+            'scores': {
+                'mulank': ms,
+                'bhagyank': bs,
+                'name_number': ns,
+                'overall_pct': overall_pct,
+            },
+            'relationship_number': rel_num,
+            'relationship_text': RELATIONSHIP_NUMBER_DATA[rel_num],
+            'pair_text': COMPAT_PAIR_TEXT.get(
+                (min(mk1, mk2), max(mk1, mk2)),
+                'A unique combination with its own special chemistry.'
+            ),
+            'loshu_compat': {
+                'grid1': {str(k): v for k, v in grid1.items()},
+                'grid2': {str(k): v for k, v in grid2.items()},
+                'combined': {str(k): v for k, v in combined.items()},
+                'gifts_1_to_2': gifts_1_to_2,
+                'gifts_2_to_1': gifts_2_to_1,
+                'shared_present': shared_present,
+                'shared_missing': shared_missing,
+                'comp_p1_pct': comp_p1_pct,
+                'comp_p2_pct': comp_p2_pct,
+                'overall_comp_pct': overall_comp_pct,
+                'dominant_plane_1': dp1_name,
+                'dominant_plane_2': dp2_name,
+                'plane_compat_text': plane_compat_text,
+                'overloaded': overloaded,
+                'combined_unique': combined_unique,
+                'arrows_new': arr_new,
+                'arrows_sustained': arr_sustained,
+                'arrows_absent': arr_absent,
+                'planes': planes_compat,
+                'key_nums': key_nums,
+                'gift_qualities': {str(k): v for k, v in GIFT_QUALITIES.items()},
+            },
+        })
     except Exception as e:
         import traceback
         traceback.print_exc()
