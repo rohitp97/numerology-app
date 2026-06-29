@@ -2352,12 +2352,13 @@ async function autoSaveReport(report) {
     if (data.report_id) {
       currentReportId = data.report_id;
       // Save PDF to storage in background (fire-and-forget)
+      // Use currentDob (hyphen-separated input) not report.dob (slash-formatted)
       fetch('/generate-pdf', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: report.name,
-          dob: report.dob,
+          name: currentName,
+          dob: currentDob,
           report_id: data.report_id,
           storage_only: true,
         }),
