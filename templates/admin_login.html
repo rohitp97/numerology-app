@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Login — Madhu Numerology</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: linear-gradient(135deg, #1a0533 0%, #2d1b69 50%, #1a0533 100%);
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .card {
+    background: rgba(255,255,255,0.07);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,215,0,0.2);
+    border-radius: 16px;
+    padding: 48px 40px;
+    width: 360px;
+    text-align: center;
+  }
+  .logo { font-size: 2.5rem; margin-bottom: 8px; }
+  h1 { color: #ffd700; font-size: 1.4rem; margin-bottom: 4px; }
+  .sub { color: rgba(255,255,255,0.5); font-size: 0.85rem; margin-bottom: 32px; }
+  label { display: block; text-align: left; color: rgba(255,255,255,0.7); font-size: 0.85rem; margin-bottom: 6px; }
+  input[type=password] {
+    width: 100%; padding: 12px 16px;
+    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,215,0,0.3);
+    border-radius: 8px; color: #fff; font-size: 1rem; outline: none;
+    transition: border-color 0.2s;
+  }
+  input[type=password]:focus { border-color: #ffd700; }
+  .error { background: rgba(220,38,38,0.2); border: 1px solid rgba(220,38,38,0.5);
+           border-radius: 8px; padding: 10px; color: #fca5a5; font-size: 0.85rem;
+           margin-bottom: 16px; }
+  button {
+    margin-top: 20px; width: 100%; padding: 13px;
+    background: linear-gradient(135deg, #ffd700, #f59e0b);
+    border: none; border-radius: 8px; color: #1a0533;
+    font-size: 1rem; font-weight: 700; cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  button:hover { opacity: 0.88; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">🔮</div>
+  <h1>Admin Login</h1>
+  <p class="sub">Madhu Prasad Numerology</p>
+  {% if error %}
+  <div class="error">{{ error }}</div>
+  {% endif %}
+  <form method="POST">
+    <label for="password">Password</label>
+    <input type="password" id="password" name="password" placeholder="Enter admin password" autofocus>
+    <button type="submit">Sign In</button>
+  </form>
+</div>
+</body>
+</html>

@@ -1,11 +1,25 @@
-from flask import Flask, render_template, request, jsonify, make_response
+from flask import Flask, render_template, request, jsonify, make_response, session, redirect, url_for
 from datetime import date
 import calendar
 import io
+import os
+from functools import wraps
 
 from numerology import calculate_all, get_personal_month, get_personal_day, get_pinnacles, get_challenges
 
 app = Flask(__name__)
+app.secret_key = os.environ.get('ADMIN_PASSWORD', 'dev-secret-fallback')
+
+# ── Supabase ───────────────────────────────────────────────────────────────────
+_sb_url = os.environ.get('SUPABASE_URL', '')
+_sb_key = os.environ.get('SUPABASE_KEY', '')
+db = None
+if _sb_url and _sb_key:
+    try:
+        from supabase import create_client
+        db = create_client(_sb_url, _sb_key)
+    except Exception:
+        pass
 
 # ── Content databases ──────────────────────────────────────────────────────────
 
@@ -1564,7 +1578,164 @@ def check_compatibility():
         return jsonify({'error': str(e)}), 500
 
 
+# ── Save Client ────────────────────────────────────────────────────────────────
+
+@app.route('/save-client', methods=['POST'])
+def save_client():
+    if not db:
+        return jsonify({'error': 'Database not configured'}), 500
+    body = request.get_json()
+    name     = body.get('name', '').strip()
+    dob      = body.get('dob', '').strip()
+    phone    = body.get('phone', '').strip()
+    email    = body.get('email', '').strip()
+    notes    = body.get('notes', '').strip()
+    summary  = body.get('summary')          # key numbers only
+
+    if not name or not dob:
+        return jsonify({'error': 'Name and DOB are required'}), 400
+    try:
+        res = db.table('clients').insert({
+            'name': name, 'dob': dob,
+            'phone': phone or None,
+            'email': email or None,
+            'notes': notes or None,
+        }).execute()
+        client_id = res.data[0]['id']
+        if summary:
+            db.table('reports').insert({
+                'client_id': client_id,
+                'report_data': summary,
+            }).execute()
+        return jsonify({'success': True, 'client_id': client_id})
+    except Exception as e:
+        import traceback; traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/save-compatibility', methods=['POST'])
+def save_compatibility_report():
+    if not db:
+        return jsonify({'error': 'Database not configured'}), 500
+    body = request.get_json()
+    name         = body.get('name', '').strip()
+    dob          = body.get('dob', '').strip()
+    phone        = body.get('phone', '').strip()
+    email        = body.get('email', '').strip()
+    partner_name = body.get('partner_name', '').strip()
+    partner_dob  = body.get('partner_dob', '').strip()
+    overall_pct  = body.get('overall_pct')
+    compat_data  = body.get('compat_data')
+
+    if not name or not dob or not partner_name or not partner_dob:
+        return jsonify({'error': 'All fields required'}), 400
+    try:
+        res = db.table('clients').insert({
+            'name': name, 'dob': dob,
+            'phone': phone or None,
+            'email': email or None,
+        }).execute()
+        client_id = res.data[0]['id']
+        db.table('compatibility_reports').insert({
+            'client_id': client_id,
+            'partner_name': partner_name,
+            'partner_dob': partner_dob,
+            'overall_pct': overall_pct,
+            'report_data': compat_data,
+        }).execute()
+        return jsonify({'success': True, 'client_id': client_id})
+    except Exception as e:
+        import traceback; traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+
+
+# ── Admin ───────────────────────────────────────────────────────────────────────
+
+def admin_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if not session.get('admin'):
+            return redirect('/admin/login')
+        return f(*args, **kwargs)
+    return decorated
+
+
+@app.route('/admin/login', methods=['GET', 'POST'])
+def admin_login():
+    error = None
+    if request.method == 'POST':
+        pwd = request.form.get('password', '')
+        if pwd == os.environ.get('ADMIN_PASSWORD', ''):
+            session['admin'] = True
+            return redirect('/admin')
+        error = 'Incorrect password. Please try again.'
+    return render_template('admin_login.html', error=error)
+
+
+@app.route('/admin/logout')
+def admin_logout():
+    session.pop('admin', None)
+    return redirect('/admin/login')
+
+
+@app.route('/admin')
+@admin_required
+def admin_dashboard():
+    if not db:
+        return 'Database not configured', 500
+    q = request.args.get('q', '').strip()
+    if q:
+        clients = db.table('clients').select('*').ilike('name', f'%{q}%').order('created_at', desc=True).execute().data
+    else:
+        clients = db.table('clients').select('*').order('created_at', desc=True).execute().data
+
+    total_reports = db.table('reports').select('id', count='exact').execute().count or 0
+    total_compat  = db.table('compatibility_reports').select('id', count='exact').execute().count or 0
+
+    return render_template('admin_dashboard.html',
+                           clients=clients, q=q,
+                           total_clients=len(clients),
+                           total_reports=total_reports,
+                           total_compat=total_compat)
+
+
+@app.route('/admin/client/<client_id>')
+@admin_required
+def admin_client(client_id):
+    if not db:
+        return 'Database not configured', 500
+    client       = db.table('clients').select('*').eq('id', client_id).single().execute().data
+    reports      = db.table('reports').select('*').eq('client_id', client_id).order('generated_at', desc=True).execute().data
+    compat       = db.table('compatibility_reports').select('*').eq('client_id', client_id).order('generated_at', desc=True).execute().data
+    consultations= db.table('consultations').select('*').eq('client_id', client_id).order('date', desc=True).execute().data
+    return render_template('admin_client.html',
+                           client=client, reports=reports,
+                           compat_reports=compat, consultations=consultations)
+
+
+@app.route('/admin/client/<client_id>/add-consultation', methods=['POST'])
+@admin_required
+def add_consultation(client_id):
+    if not db:
+        return 'Database not configured', 500
+    db.table('consultations').insert({
+        'client_id': client_id,
+        'date':  request.form.get('date') or None,
+        'fee':   float(request.form.get('fee')) if request.form.get('fee') else None,
+        'notes': request.form.get('notes') or None,
+    }).execute()
+    return redirect(f'/admin/client/{client_id}')
+
+
+@app.route('/admin/client/<client_id>/delete', methods=['POST'])
+@admin_required
+def delete_client(client_id):
+    if not db:
+        return 'Database not configured', 500
+    db.table('clients').delete().eq('id', client_id).execute()
+    return redirect('/admin')
+
+
 if __name__ == '__main__':
-    import os
     port = int(os.environ.get('PORT', 5000))
     app.run(debug=True, port=port)
