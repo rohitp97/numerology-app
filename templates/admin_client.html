@@ -123,7 +123,15 @@
       <div class="report-card">
         <div class="report-card-top">
           <div style="font-size:0.9rem; color:rgba(255,255,255,0.8);">Numerology Report</div>
-          <div class="report-date">{{ r.generated_at[:10] if r.generated_at else '—' }}</div>
+          <div style="display:flex; align-items:center; gap:12px;">
+            {% if r.pdf_url %}
+            <a href="{{ r.pdf_url }}" target="_blank"
+               style="font-size:0.8rem; color:#ffd700; text-decoration:none; border:1px solid rgba(255,215,0,0.4); padding:3px 10px; border-radius:5px;">
+              &#8595; PDF
+            </a>
+            {% endif %}
+            <div class="report-date">{{ r.generated_at[:10] if r.generated_at else '—' }}</div>
+          </div>
         </div>
         {% if r.report_data %}
         <div class="key-nums">

@@ -1050,6 +1050,7 @@ def generate_pdf():
     body = request.get_json()
     name = body.get('name', '').strip()
     dob = body.get('dob', '').strip()
+    report_id = body.get('report_id')
     if not name or not dob:
         return jsonify({'error': 'Name and date of birth are required'}), 400
 
@@ -1393,9 +1394,25 @@ def generate_pdf():
         ))
 
         doc.build(story)
-        buffer.seek(0)
+        pdf_bytes = buffer.getvalue()
 
-        response = make_response(buffer.read())
+        # Upload to Supabase Storage and update record
+        if db and report_id:
+            try:
+                import re
+                from datetime import datetime as _dt
+                safe = re.sub(r'[^a-zA-Z0-9_-]', '_', name)
+                file_path = f"{safe}_{dob.replace('/', '-')}_{_dt.utcnow().strftime('%Y%m%d%H%M%S')}.pdf"
+                db.storage.from_('reports').upload(
+                    file_path, pdf_bytes,
+                    {'content-type': 'application/pdf', 'x-upsert': 'true'}
+                )
+                pdf_url = db.storage.from_('reports').get_public_url(file_path)
+                db.table('reports').update({'pdf_url': pdf_url}).eq('id', report_id).execute()
+            except Exception:
+                pass  # Storage failure should never block the download
+
+        response = make_response(pdf_bytes)
         response.headers['Content-Type'] = 'application/pdf'
         response.headers['Content-Disposition'] = f'attachment; filename="{name} - Numerology Report.pdf"'
         return response
@@ -1602,12 +1619,14 @@ def save_client():
             'notes': notes or None,
         }).execute()
         client_id = res.data[0]['id']
+        report_id = None
         if summary:
-            db.table('reports').insert({
+            r = db.table('reports').insert({
                 'client_id': client_id,
                 'report_data': summary,
             }).execute()
-        return jsonify({'success': True, 'client_id': client_id})
+            report_id = r.data[0]['id']
+        return jsonify({'success': True, 'client_id': client_id, 'report_id': report_id})
     except Exception as e:
         import traceback; traceback.print_exc()
         return jsonify({'error': str(e)}), 500
