@@ -240,18 +240,6 @@
     .btn-pdf:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(139,69,19,0.4); }
     .btn-pdf:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
-    .btn-save-db {
-      display: flex; align-items: center; gap: 8px;
-      margin: 0.75rem auto 0;
-      padding: 10px 24px;
-      background: transparent;
-      border: 2px solid rgba(255,215,0,0.4);
-      border-radius: 8px;
-      color: rgba(255,215,0,0.85);
-      font-size: 0.9rem; font-weight: 600; cursor: pointer;
-      transition: all 0.2s;
-    }
-    .btn-save-db:hover { background: rgba(255,215,0,0.08); border-color: #ffd700; color: #ffd700; }
 
     /* Report Header */
     .report-header {
@@ -1231,11 +1219,6 @@
       &#8595; Download PDF Report
     </button>
 
-    <!-- Save to DB button -->
-    <button class="btn-save-db" id="btn-save-client" onclick="openSaveModal('personal')">
-      &#128190; Save to Client Database
-    </button>
-
     <!-- Consultation Card -->
     <div class="consult-card">
       <div class="consult-heading">Name Correction &amp; Personal Consultation</div>
@@ -1349,56 +1332,14 @@
       </div>
     </div>
 
-    <!-- Save Compatibility button -->
-    <button class="btn-save-db" id="btn-save-compat" onclick="openSaveModal('compat')" style="margin-top:1.5rem;">
-      &#128190; Save Compatibility to Client Database
-    </button>
-
   </div><!-- /#compat-result -->
 
 </div><!-- /.container -->
-
-<!-- Save Client Modal -->
-<div id="save-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:1000; align-items:center; justify-content:center;">
-  <div style="background:#1e1040; border:1px solid rgba(255,215,0,0.3); border-radius:16px; padding:32px; width:420px; max-width:95vw; max-height:90vh; overflow-y:auto;">
-    <h3 id="save-modal-title" style="color:#ffd700; margin-bottom:4px; font-size:1.1rem;">Save to Client Database</h3>
-    <p id="save-modal-subtitle" style="color:rgba(255,255,255,0.5); font-size:0.82rem; margin-bottom:20px;"></p>
-    <div style="display:flex; flex-direction:column; gap:12px;">
-      <div>
-        <label style="display:block; font-size:0.8rem; color:rgba(255,255,255,0.5); margin-bottom:4px;">Phone (optional)</label>
-        <input id="save-phone" type="tel" placeholder="+91 98765 43210"
-          style="width:100%; padding:9px 12px; background:rgba(255,255,255,0.07); border:1px solid rgba(255,215,0,0.25); border-radius:7px; color:#fff; font-size:0.9rem; outline:none;">
-      </div>
-      <div>
-        <label style="display:block; font-size:0.8rem; color:rgba(255,255,255,0.5); margin-bottom:4px;">Email (optional)</label>
-        <input id="save-email" type="email" placeholder="client@example.com"
-          style="width:100%; padding:9px 12px; background:rgba(255,255,255,0.07); border:1px solid rgba(255,215,0,0.25); border-radius:7px; color:#fff; font-size:0.9rem; outline:none;">
-      </div>
-      <div id="save-notes-wrap">
-        <label style="display:block; font-size:0.8rem; color:rgba(255,255,255,0.5); margin-bottom:4px;">Notes (optional)</label>
-        <textarea id="save-notes" rows="3" placeholder="Any initial observations…"
-          style="width:100%; padding:9px 12px; background:rgba(255,255,255,0.07); border:1px solid rgba(255,215,0,0.25); border-radius:7px; color:#fff; font-size:0.9rem; outline:none; resize:vertical; font-family:inherit;"></textarea>
-      </div>
-    </div>
-    <div id="save-modal-msg" style="display:none; margin-top:14px; padding:10px 14px; border-radius:8px; font-size:0.85rem;"></div>
-    <div style="display:flex; gap:10px; margin-top:20px;">
-      <button id="save-modal-btn" onclick="submitSave()"
-        style="flex:1; padding:11px; background:linear-gradient(135deg,#ffd700,#f59e0b); border:none; border-radius:8px; color:#1a0533; font-weight:700; font-size:0.95rem; cursor:pointer;">
-        Save
-      </button>
-      <button onclick="closeSaveModal()"
-        style="padding:11px 18px; background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.15); border-radius:8px; color:rgba(255,255,255,0.6); cursor:pointer;">
-        Cancel
-      </button>
-    </div>
-  </div>
-</div>
 
 <script>
 // ── State ──────────────────────────────────────────────────────────────────────
 let currentName = '';
 let currentDob = '';
-let _lastReport = null;
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function esc(str) {
@@ -1554,6 +1495,7 @@ async function generateReport() {
       return;
     }
     renderReport(data);
+    autoSaveReport(data);
   } catch (e) {
     showError('Network error. Please check your connection and try again.');
   } finally {
@@ -1603,7 +1545,6 @@ function fmtNum(n) {
 
 // ── Render ────────────────────────────────────────────────────────────────────
 function renderReport(d) {
-  _lastReport = d;
   // Header
   document.getElementById('report-name').textContent = d.name;
   document.getElementById('report-dob').textContent = 'Date of Birth: ' + d.dob;
@@ -2380,6 +2321,7 @@ async function checkCompatibility() {
       return;
     }
     renderCompatResult(data);
+    autoSaveCompat(data);
   } catch (e) {
     showCompatError('Network error. Please check your connection and try again.');
   } finally {
@@ -2388,108 +2330,43 @@ async function checkCompatibility() {
   }
 }
 
-// ── Save to Client Database ───────────────────────────────────────────────────
-let _saveMode = 'personal'; // 'personal' | 'compat'
-let _compatData = null;     // populated by renderCompatResult
-
-function openSaveModal(mode) {
-  _saveMode = mode;
-  const modal = document.getElementById('save-modal');
-  const title = document.getElementById('save-modal-title');
-  const sub   = document.getElementById('save-modal-subtitle');
-  const msg   = document.getElementById('save-modal-msg');
-  const notesWrap = document.getElementById('save-notes-wrap');
-  document.getElementById('save-phone').value = '';
-  document.getElementById('save-email').value = '';
-  document.getElementById('save-notes').value = '';
-  msg.style.display = 'none';
-  document.getElementById('save-modal-btn').disabled = false;
-  document.getElementById('save-modal-btn').textContent = 'Save';
-  if (mode === 'personal') {
-    title.textContent = 'Save to Client Database';
-    sub.textContent = currentName + ' · ' + currentDob;
-    notesWrap.style.display = 'block';
-  } else {
-    title.textContent = 'Save Compatibility Report';
-    sub.textContent = (_compatData ? _compatData.person1.name + ' ↔ ' + _compatData.person2.name : '');
-    notesWrap.style.display = 'none';
-  }
-  modal.style.display = 'flex';
-}
-
-function closeSaveModal() {
-  document.getElementById('save-modal').style.display = 'none';
-}
-
-async function submitSave() {
-  const btn   = document.getElementById('save-modal-btn');
-  const msg   = document.getElementById('save-modal-msg');
-  const phone = document.getElementById('save-phone').value.trim();
-  const email = document.getElementById('save-email').value.trim();
-  const notes = document.getElementById('save-notes').value.trim();
-  btn.disabled = true;
-  btn.textContent = 'Saving…';
-  msg.style.display = 'none';
-
+// ── Auto-save to Client Database (silent) ────────────────────────────────────
+async function autoSaveReport(report) {
   try {
-    let body, url;
-    if (_saveMode === 'personal') {
-      url = '/save-client';
-      body = {
-        name: currentName, dob: currentDob,
-        phone, email, notes,
-        summary: _lastReport ? {
-          mulank: _lastReport.mulank,
-          bhagyank: _lastReport.bhagyank,
-          name_number: _lastReport.name_number,
-          personal_year: _lastReport.personal_year,
-        } : null,
-      };
-    } else {
-      if (!_compatData) { showSaveMsg('No compatibility data to save.', false); return; }
-      url = '/save-compatibility';
-      const pct = _compatData.scores ? _compatData.scores.overall_pct : null;
-      body = {
-        name: _compatData.person1.name, dob: _compatData.person1.dob,
-        phone, email,
-        partner_name: _compatData.person2.name, partner_dob: _compatData.person2.dob,
-        overall_pct: pct,
-        compat_data: { score: pct },
-      };
-    }
-    const res = await fetch(url, {
+    await fetch('/save-client', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
+      body: JSON.stringify({
+        name: report.name,
+        dob: report.dob,
+        summary: {
+          mulank: report.mulank,
+          bhagyank: report.bhagyank,
+          name_number: report.name_number,
+          personal_year: report.personal_year,
+        },
+      }),
     });
-    const data = await res.json();
-    if (data.error) {
-      showSaveMsg('Error: ' + data.error, false);
-    } else {
-      showSaveMsg('Saved successfully! ✓', true);
-      setTimeout(closeSaveModal, 1600);
-    }
-  } catch(e) {
-    showSaveMsg('Network error. Please try again.', false);
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'Save';
-  }
+  } catch(e) { /* silent */ }
 }
 
-function showSaveMsg(text, ok) {
-  const msg = document.getElementById('save-modal-msg');
-  msg.textContent = text;
-  msg.style.display = 'block';
-  msg.style.background = ok ? 'rgba(74,222,128,0.15)' : 'rgba(220,38,38,0.15)';
-  msg.style.border = ok ? '1px solid rgba(74,222,128,0.4)' : '1px solid rgba(220,38,38,0.4)';
-  msg.style.color = ok ? '#4ade80' : '#fca5a5';
+async function autoSaveCompat(data) {
+  try {
+    const pct = data.scores ? data.scores.overall_pct : null;
+    await fetch('/save-compatibility', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: data.person1.name,
+        dob: data.person1.dob,
+        partner_name: data.person2.name,
+        partner_dob: data.person2.dob,
+        overall_pct: pct,
+        compat_data: { score: pct },
+      }),
+    });
+  } catch(e) { /* silent */ }
 }
-
-// Close modal on backdrop click
-document.getElementById('save-modal').addEventListener('click', function(e) {
-  if (e.target === this) closeSaveModal();
-});
 </script>
 
 </body>
