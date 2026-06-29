@@ -1406,13 +1406,17 @@ def generate_pdf():
                 safe = re.sub(r'[^a-zA-Z0-9_-]', '_', name)
                 file_path = f"{safe}_{dob.replace('/', '-')}_{_dt.utcnow().strftime('%Y%m%d%H%M%S')}.pdf"
                 db.storage.from_('reports').upload(
-                    file_path, pdf_bytes,
-                    {'content-type': 'application/pdf', 'x-upsert': 'true'}
+                    path=file_path,
+                    file=pdf_bytes,
+                    file_options={'contentType': 'application/pdf', 'upsert': True}
                 )
                 pdf_url = db.storage.from_('reports').get_public_url(file_path)
                 db.table('reports').update({'pdf_url': pdf_url}).eq('id', report_id).execute()
-            except Exception:
-                pass
+                print(f'[PDF] Uploaded: {file_path} → {pdf_url}')
+            except Exception as e:
+                import traceback
+                print(f'[PDF] Storage upload failed: {e}')
+                traceback.print_exc()
 
         if storage_only:
             return jsonify({'ok': True, 'pdf_url': pdf_url})
