@@ -1408,7 +1408,7 @@ def generate_pdf():
                 db.storage.from_('reports').upload(
                     path=file_path,
                     file=pdf_bytes,
-                    file_options={'contentType': 'application/pdf', 'upsert': True}
+                    file_options={'contentType': 'application/pdf', 'upsert': 'true'}
                 )
                 pdf_url = db.storage.from_('reports').get_public_url(file_path)
                 db.table('reports').update({'pdf_url': pdf_url}).eq('id', report_id).execute()
