@@ -2349,7 +2349,20 @@ async function autoSaveReport(report) {
       }),
     });
     const data = await res.json();
-    if (data.report_id) currentReportId = data.report_id;
+    if (data.report_id) {
+      currentReportId = data.report_id;
+      // Save PDF to storage in background (fire-and-forget)
+      fetch('/generate-pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: report.name,
+          dob: report.dob,
+          report_id: data.report_id,
+          storage_only: true,
+        }),
+      }).catch(() => {});
+    }
   } catch(e) { /* silent */ }
 }
 

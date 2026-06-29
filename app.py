@@ -1051,6 +1051,7 @@ def generate_pdf():
     name = body.get('name', '').strip()
     dob = body.get('dob', '').strip()
     report_id = body.get('report_id')
+    storage_only = body.get('storage_only', False)
     if not name or not dob:
         return jsonify({'error': 'Name and date of birth are required'}), 400
 
@@ -1397,6 +1398,7 @@ def generate_pdf():
         pdf_bytes = buffer.getvalue()
 
         # Upload to Supabase Storage and update record
+        pdf_url = None
         if db and report_id:
             try:
                 import re
@@ -1410,7 +1412,10 @@ def generate_pdf():
                 pdf_url = db.storage.from_('reports').get_public_url(file_path)
                 db.table('reports').update({'pdf_url': pdf_url}).eq('id', report_id).execute()
             except Exception:
-                pass  # Storage failure should never block the download
+                pass
+
+        if storage_only:
+            return jsonify({'ok': True, 'pdf_url': pdf_url})
 
         response = make_response(pdf_bytes)
         response.headers['Content-Type'] = 'application/pdf'
